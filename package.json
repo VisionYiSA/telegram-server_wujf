@@ -1,0 +1,9 @@
+{
+  "name": "Telegram-server",
+  "description": "Telegram server side",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "express": "4.x"
+  }
+}
