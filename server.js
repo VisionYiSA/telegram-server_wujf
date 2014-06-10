@@ -1,5 +1,8 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
 
 var Post = [
 	{
@@ -52,28 +55,50 @@ var User = [{
 
 // All Routes
 app.get('/', function(req, res){
-
+	res.send("\
+		<form method='post' action='/'>\
+			<input type='text' name='email' placeholder='email'/>\
+			<input type='text' name='name' placeholder='name'/>\
+			<input type='text' name='username' placeholder='username'/>\
+			<input type='password' name='password' placeholder='password'/>\
+			<input type='submit' value='Submit' />\
+		</form>\
+	");
 });
 app.post('/', function(req, res){
-	User.create({ // This part needs User model in server-side (mongoDB)
+	console.log(req.body);
+	console.log(JSON.stringify(req.body));
+	var userInfo = {			
 		id: req.body.username,
 		name: req.body.name,
 		eamil: req.body.email,
 		password: req.body.password,
-		avatar: null
-	}, function(err, user){
-		if(err) res.send(err);
-	});
+		avatar: ''
+	};
+	User.push(userInfo);
+	res.send(200, {user: userInfo});
+	// res.redirect('/posts');
 })
 app.get('/login', function(req, res){
-
+	res.send("\
+		<form method='post' action='/login'>\
+			<input type='text' name='username' placeholder='username'/>\
+			<input type='password' name='password' placeholder='password'/>\
+			<input type='submit' value='Login' />\
+		</form>\
+	");
 });
 app.post('/login', function(req, res){
-	var eamil = req.body.email;
+	var username = req.body.username;
 	var password = req.body.password;
-	var theUser = User.find({email: email});
-	if(theUser && password == theUser.password){
-		res.send(200, {session.user: theUser})
+	var theUser = {
+		id: 'will',
+    name: 'Will Smith',
+    email: 'will@example.com',
+    password: 'password',
+    avatar: ''};
+	if(username == theUser.username && password == theUser.password){
+		res.redirect('/posts');
 	} else {
 		res.send('User credential does not match.');
 	}
@@ -82,34 +107,29 @@ app.get('/resetpassword', function(req, res){
 	
 });
 app.post('/resetpassword', function(req, res){
-	var eamil = req.body.email;
-	var username = req.body.username;
-	var theUser = User.find({email: email});
-	if(theUser && username == theUser.id){
-		// Send Email
-	} else {
-		res.send('User credential does not match.');
-	}
+
 });
 app.get('/sentpassnotify', function(req, res){
 	
 });
 
 app.get('/posts', function(req, res){
-	res.send(200, {posts: Post});
+	res.send("\
+		<form method='post' action='/posts'>\
+			<input type='text' name='body' placeholder='body'/>\
+			<input type='submit' value='Publish' />\
+		</form>\
+		<div>Body: "+Post[Post.length-1].body+"</div>\
+	");
+	// res.send(200, {posts: Post});
 });
-app.put('/posts', function(req, res){
-	Post.create({ // This part needs Post model in server-side (mongoDB)
-		body: req.body,
-		user: 'CurrentUser',// Automatically assigns the logged-in user
-		date: 'A few seconds ago'// Automatically create date in model
-	}, function(err, post){
-		if(err) res.send(err);
-		Post.find(function(err, posts){
-			if(err) res.send(err);
-			res.send(200, {posts: Post});
-		});
+app.post('/posts', function(req, res){
+	Post.push({ 
+		body: req.body.body,
+		user: 'CurrentUser',
+		date: 'A few seconds ago'
 	});
+	res.send(200, {posts: Post});
 });
 
 app.get('/users/:user_id', function(req, res){
