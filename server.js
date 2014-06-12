@@ -15,28 +15,51 @@ var Post = [
     body: 'Salut! This is 2nd oldest post, from Joseph!',
     user: 'joseph',
     date: 'Sat, 10 May 2014 21:33:30 GMT'
+  },{
+    id: 3,
+    body: 'Hey everyone, I am Gal Gagot!',
+    user: 'gal',
+    date: 'Tue, 20 May 2014 22:33:32 GMT'
+  },{
+    id: 4,
+    body: 'What up! This is latest post!',
+    user: 'beyonce',
+    date: 'Thu, 29 May 2014 23:33:30 GMT'
   }];
 
-var User = [{
+var User = [
+	{
     id: 'will',
     name: 'Will Smith',
     email: 'will@example.com',
     password: 'password',
-    avatar: ''
+    avatar: 'images/will.jpg'
   },{
     id: 'beyonce',
     name: 'Beyonce Knowles',
     email: 'beyonce@example.com',
     password: 'password',
-    avatar: ''
+    avatar: 'images/beyonce.jpeg'
+  },{
+    id: 'joseph',
+    name: 'Joseph Gordon-Levitt',
+    email: 'joseph@example.com',
+    password: 'password',
+    avatar: 'images/joseph.jpeg'
+  },{
+    id: 'gal',
+    name: 'Gal Gagot',
+    email: 'gal@example.com',
+    password: 'password',
+    avatar: 'images/gal.jpg'
   }];
 
-// All Routes
+// =========== Register ===========
 app.get('/', function(req, res){
 	res.send('Register');
 });
 
-app.post('/', function(req, res){
+app.post('/api/users', function(req, res){
 	var userInfo = {			
 		id: req.body.username,
 		name: req.body.name,
@@ -45,56 +68,76 @@ app.post('/', function(req, res){
 		avatar: ''
 	};
 	User.push(userInfo);
-	res.redirect('/login');
-})
+	res.redirect('/api/posts');
+});
 
+// =========== Login ===========
 app.get('/login', function(req, res){
 	res.send('Login');
 });
 
-app.post('/login', function(req, res){
-	var username = req.body.username;
-	var password = req.body.password;
-	if(username === User[User.length-1].id && password === User[User.length-1].password){
-		res.redirect('/posts');
-	} else {
-		res.send('User credential does not match.');
+app.get('/api/users/:user_id', function(req, res){
+	var username = req.params.user_id;
+	// console.log('username '+username);
+	var found = false;
+	for(var i=0; i < User.length ; i++){
+		if(username === User[i].id){
+			found = true;
+			// console.log('user '+User[i].id);
+			res.send(200, {user: User[i]});
+		}
+	} 
+	if(found === false){
+		res.send(400);
 	}
 });
 
-app.get('/resetpassword', function(req, res){
-	
-});
-app.post('/resetpassword', function(req, res){
+app.get('/api/resetpassword',  function(req, res){});
+app.post('/api/resetpassword', function(req, res){});
+app.get('/api/sentpassnotify', function(req, res){});
 
-});
-app.get('/sentpassnotify', function(req, res){
-	
-});
-
-app.get('/posts', function(req, res){
+// =========== GET Posts ===========
+app.get('/api/posts', function(req, res){
 	res.send(200, {posts: Post});
 });
-
-app.post('/posts', function(req, res){
-	Post.push({ 
-		body: req.body.body,
-		user: User[User.length-1].id,
-		date: new Date()
-	});
+// =========== CREATE post ===========
+app.post('/api/posts', function(req, res){
+	var newPostId = Post.length+1;
+	// console.log(req.body.post);
+	// console.log("New Post id: "+newPostId);
+	var newPost = { 
+		id: newPostId,
+		body: req.body.post.body,
+		user: req.body.post.user,
+		date: req.body.post.date
+	};
+	Post.push(newPost);
 	res.send(200, {posts: Post});
-	res.redirect('/posts')
+	res.redirect('/api/posts')
+});
+// =========== DELETE post ===========
+app.delete('/api/posts/:post_id', function(req, res){
+	var postToDelete = req.params.post_id;
+	// console.log("Delete Post id: "+req.params.post_id);
+	var found = false;
+	for(var i=0; i < Post.length ; i++){
+		if(postToDelete == Post[i].id){
+			// console.log("Post body in array: "+Post[i].body);
+			found = true;
+			Post.splice(Post.indexOf(Post[i]), 1);
+			res.send(200);
+			res.redirect('/api/posts');
+		}
+	} 
+	if(found == false) res.send(400);
 });
 
-app.get('/users/:user_id', function(req, res){
+// =========== User page ===========
+app.get('/api/users/:user_id/following', function(req, res){
 	res.send(200, {user: req.params.user_id});
 });
 
-app.get('/users/:user_id/following', function(req, res){
-	res.send(200, {user: req.params.user_id});
-});
-
-app.get('/users/:user_id/followers', function(req, res){
+app.get('/api/users/:user_id/followers', function(req, res){
 	res.send(200, {user: req.params.user_id});
 });
 
