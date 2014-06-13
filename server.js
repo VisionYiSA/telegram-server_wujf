@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser());
 
 var Post = [
-	{
+  {
     id: 1,
     body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mini',
     user: 'will',
@@ -28,7 +28,7 @@ var Post = [
   }];
 
 var User = [
-	{
+  {
     id: 'will',
     name: 'Will Smith',
     email: 'will@example.com',
@@ -56,41 +56,65 @@ var User = [
 
 // =========== Register ===========
 app.get('/', function(req, res){
-	res.send('Register');
+  res.send('Register');
 });
 
 app.post('/api/users', function(req, res){
-	var userInfo = {			
-		id: req.body.username,
-		name: req.body.name,
-		eamil: req.body.email,
-		password: req.body.password,
-		avatar: ''
-	};
-	User.push(userInfo);
-	res.redirect('/api/posts');
+  // console.log(req.body);
+  var userInfo = {      
+    id: req.body.user.username,
+    name: req.body.user.name,
+    eamil: req.body.user.email,
+    password: req.body.user.password,
+    avatar: null
+  };
+  // console.log(userInfo);
+  User.push(userInfo);
+  res.send(200, {user: userInfo});
+  // res.redirect('/api/posts');
 });
 
 // =========== Login ===========
 app.get('/login', function(req, res){
-	res.send('Login');
+  res.send('Login');
 });
 
-app.get('/api/users/:user_id', function(req, res){
-	var username = req.params.user_id;
-	// console.log('username '+username);
-	var found = false;
-	for(var i=0; i < User.length ; i++){
-		if(username === User[i].id){
-			found = true;
-			// console.log('user '+User[i].id);
-			res.send(200, {user: User[i]});
-		}
-	} 
-	if(found === false){
-		res.send(400);
-	}
+app.get('/api/users', function(req, res){
+  var username = req.query.id;
+  var password = req.query.password;
+  var operation = req.query.operation;
+
+  if(operation == 'login'){
+    var found = false;
+    for(var i=0; i < User.length ; i++){
+      if(username === User[i].id){
+        // console.log(User[i]);
+        found = true;
+        return res.send(200, {user: User[i]});
+      }
+    }
+    if(found === false){
+      // console.log(username+' '+password+' '+operation);
+      res.send(400);
+    }
+  }
 });
+
+// app.get('/api/users/:user_id', function(req, res){
+//  var username = req.params.user_id;
+//  // console.log('username '+username);
+//  var found = false;
+//  for(var i=0; i < User.length ; i++){
+//    if(username === User[i].id){
+//      found = true;
+//      // console.log('user '+User[i].id);
+//      res.send(200, {user: User[i]});
+//    }
+//  } 
+//  if(found === false){
+//    res.send(400);
+//  }
+// });
 
 app.get('/api/resetpassword',  function(req, res){});
 app.post('/api/resetpassword', function(req, res){});
@@ -98,49 +122,49 @@ app.get('/api/sentpassnotify', function(req, res){});
 
 // =========== GET Posts ===========
 app.get('/api/posts', function(req, res){
-	res.send(200, {posts: Post});
+  res.send(200, {posts: Post});
 });
 // =========== CREATE post ===========
 app.post('/api/posts', function(req, res){
-	var newPostId = Post.length+1;
-	// console.log(req.body.post);
-	// console.log("New Post id: "+newPostId);
-	var newPost = { 
-		id: newPostId,
-		body: req.body.post.body,
-		user: req.body.post.user,
-		date: req.body.post.date
-	};
-	Post.push(newPost);
-	res.send(200, {posts: Post});
-	res.redirect('/api/posts')
+  var newPostId = Post.length+1;
+  // console.log(req.body.post);
+  // console.log("New Post id: "+newPostId);
+  var newPost = { 
+    id: newPostId,
+    body: req.body.post.body,
+    user: req.body.post.user,
+    date: req.body.post.date
+  };
+  Post.push(newPost);
+  res.send(200, {post: newPost});
+  // res.redirect('/api/posts')
 });
 // =========== DELETE post ===========
 app.delete('/api/posts/:post_id', function(req, res){
-	var postToDelete = req.params.post_id;
-	// console.log("Delete Post id: "+req.params.post_id);
-	var found = false;
-	for(var i=0; i < Post.length ; i++){
-		if(postToDelete == Post[i].id){
-			// console.log("Post body in array: "+Post[i].body);
-			found = true;
-			Post.splice(Post.indexOf(Post[i]), 1);
-			res.send(200);
-			res.redirect('/api/posts');
-		}
-	} 
-	if(found == false) res.send(400);
+  var postToDelete = req.params.post_id;
+  // console.log("Delete Post id: "+req.params.post_id);
+  var found = false;
+  for(var i=0; i < Post.length ; i++){
+    if(postToDelete == Post[i].id){
+      // console.log("Post body in array: "+Post[i].body);
+      found = true;
+      Post.splice(Post.indexOf(Post[i]), 1);
+      res.send(200);
+      // res.redirect('/api/posts');
+    }
+  } 
+  if(found == false) res.send(400);
 });
 
 // =========== User page ===========
 app.get('/api/users/:user_id/following', function(req, res){
-	res.send(200, {user: req.params.user_id});
+  res.send(200, {user: req.params.user_id});
 });
 
 app.get('/api/users/:user_id/followers', function(req, res){
-	res.send(200, {user: req.params.user_id});
+  res.send(200, {user: req.params.user_id});
 });
 
 var server = app.listen(3000, function(){
-	console.log('Listening on port %d', server.address().port);
+  console.log('Listening on port %d', server.address().port);
 });
