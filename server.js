@@ -60,9 +60,9 @@ app.get('/', function(req, res){
 });
 
 app.post('/api/users', function(req, res){
-  // console.log(req.body);
+  // console.log(req.body.user);
   var userInfo = {      
-    id: req.body.user.username,
+    id: req.body.user.id,
     name: req.body.user.name,
     eamil: req.body.user.email,
     password: req.body.user.password,
