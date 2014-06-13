@@ -100,6 +100,20 @@ app.get('/api/users', function(req, res){
   }
 });
 
+app.get('/api/users/:user_id', function(req, res){
+  var username = req.params.user_id;
+  var found = false;
+  for(var i=0; i < User.length ; i++){
+    if(username === User[i].id){
+      found = true;
+      res.send(200, {user: User[i]});
+    }
+  } 
+  if(found === false){
+    res.send(400);
+  }
+});
+
 app.get('/api/resetpassword',  function(req, res){});
 app.post('/api/resetpassword', function(req, res){});
 app.get('/api/sentpassnotify', function(req, res){});
