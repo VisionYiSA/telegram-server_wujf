@@ -87,10 +87,10 @@ app.get('/api/users', function(req, res){
   if(operation == 'login'){
     var found = false;
     for(var i=0; i < User.length ; i++){
-      if(username === User[i].id){
+      if(username === User[i].id && password === User[i].password){
         // console.log(User[i]);
         found = true;
-        return res.send(200, {user: User[i]});
+        return res.send(200, {users: [User[i]]});
       }
     }
     if(found === false){
@@ -99,22 +99,6 @@ app.get('/api/users', function(req, res){
     }
   }
 });
-
-// app.get('/api/users/:user_id', function(req, res){
-//  var username = req.params.user_id;
-//  // console.log('username '+username);
-//  var found = false;
-//  for(var i=0; i < User.length ; i++){
-//    if(username === User[i].id){
-//      found = true;
-//      // console.log('user '+User[i].id);
-//      res.send(200, {user: User[i]});
-//    }
-//  } 
-//  if(found === false){
-//    res.send(400);
-//  }
-// });
 
 app.get('/api/resetpassword',  function(req, res){});
 app.post('/api/resetpassword', function(req, res){});
