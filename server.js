@@ -2,13 +2,32 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var session = require('express-session');
 var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 
 app.use(bodyParser());
 app.use(cookieParser());
-app.use(express.session({ secret: 'secret_key' }));
+app.use(session({ secret: 'secret_key' }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    var found = false;
+    for(var i=0; i < User.length ; i++){
+      if(username === User[i].id && password === User[i].password){
+        found = true;
+        console.log('success');
+        return done(null, {user: [User[i]]});
+      }
+    }
+    if(found === false){
+      console.log('failed');
+      return done(null, false);
+    }
+  }
+));
 
 var Post = [
   {
@@ -91,19 +110,26 @@ app.get('/api/users', function(req, res){
   var operation = req.query.operation;
 
   if(operation == 'login'){
-    var found = false;
-    for(var i=0; i < User.length ; i++){
-      if(username === User[i].id && password === User[i].password){
-        // console.log(User[i]);
-        found = true;
-        return res.send(200, {users: [User[i]]});
-      }
-    }
-    if(found === false){
-      // console.log(username+' '+password+' '+operation);
-      res.send(400);
-    }
+    passport.authenticate('local', 
+      { successRedirect: '/posts', 
+        failureRedirect: '/login' }
+    );
   }
+
+  // if(operation == 'login'){
+  //   var found = false;
+  //   for(var i=0; i < User.length ; i++){
+  //     if(username === User[i].id && password === User[i].password){
+  //       // console.log(User[i]);
+  //       found = true;
+  //       return res.send(200, {users: [User[i]]});
+  //     }
+  //   }
+  //   if(found === false){
+  //     // console.log(username+' '+password+' '+operation);
+  //     res.send(400);
+  //   }
+  // }
 });
 
 app.get('/api/users/:user_id', function(req, res){
