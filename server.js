@@ -1,8 +1,14 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var passport = require('passport');
 
 app.use(bodyParser());
+app.use(cookieParser());
+app.use(express.session({ secret: 'secret_key' }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 var Post = [
   {

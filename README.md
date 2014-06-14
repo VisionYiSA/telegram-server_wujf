@@ -15,4 +15,4 @@
 * Register / Login issue [https://gist.github.com/yhagio/899e743441c66e15c2f6](https://gist.github.com/yhagio/899e743441c66e15c2f6)
 
 * **Step2**
-* Installed Passport & Passport-Local
+* Installed Passport & Passport-Local & Cookie-Parser
