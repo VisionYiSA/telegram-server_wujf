@@ -3,7 +3,7 @@
 * Client side repo: [https://github.com/yhagio/telegram-cli](https://github.com/yhagio/telegram-cli)
 
 #### Todos:
-* **step1**
+* **Step1**
 * nginx settings [http://yhagio.github.io/blog/2014/06/12/nginx-setup/](http://yhagio.github.io/blog/2014/06/12/nginx-setup/)
 * Implement all the routes required by the ember.js app with the same dummy data from the previously used fixtures adapter (client side). 
 - [Routing ](http://expressjs.com/4x/api.html#app.VERB), 
@@ -14,5 +14,6 @@
 
 * Register / Login issue [https://gist.github.com/yhagio/899e743441c66e15c2f6](https://gist.github.com/yhagio/899e743441c66e15c2f6)
 
-* **Step2**
-* Installed Passport & Passport-Local & Cookie-Parser
+* **Step2 - Passport Authentication**
+* Installed `passport`, `passport-local`, `cookie-parser`, `express-session`.
+* 
