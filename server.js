@@ -134,7 +134,7 @@ app.get('/api/users', function(req, res, next){
       req.login(user, function(err) {
         if (err) { return res.send(400); }
         console.log(user);
-        return res.send(200, {user: user});
+        return res.send(200, {user: [user]});
       });
     })(req, res, next);
   }
