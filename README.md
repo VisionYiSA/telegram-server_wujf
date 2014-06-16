@@ -16,4 +16,4 @@
 
 * **Step2 - Passport Authentication**
 * Installed `passport`, `passport-local`, `cookie-parser`, `express-session`.
-* 
+* Issue note [https://gist.github.com/yhagio/0e29815cd1e1f086242e](https://gist.github.com/yhagio/0e29815cd1e1f086242e)

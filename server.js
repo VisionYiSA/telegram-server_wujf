@@ -20,7 +20,9 @@ passport.deserializeUser(function(id, done) {
   }
 });
 
-passport.use('local', new LocalStrategy(
+passport.use('local', new LocalStrategy({
+    usernameField: 'id'
+  },
   function(username, password, done) {
     var found = false;
     for(var i=0; i < User.length ; i++){
@@ -28,7 +30,8 @@ passport.use('local', new LocalStrategy(
          password === User[i].password){
         found = true;
         console.log('success');
-        return done(null, user);
+        console.log(User[i]);
+        return done(null, User[i]);
       }
     }
     if(found === false){
@@ -126,11 +129,12 @@ app.get('/api/users', function(req, res, next){
 
   if(operation == 'login'){
     passport.authenticate('local', function(err, user, info) {
-      if (err) { return next(err); }
-      if (!user) { return res.send(404); }
+      if (err) { return res.send(400); }
+      if (!user) { return res.send(400); }
       req.login(user, function(err) {
-        if (err) { return next(err); }
-        return user;
+        if (err) { return res.send(400); }
+        console.log(user);
+        return res.send(200, {user: user});
       });
     })(req, res, next);
   }
