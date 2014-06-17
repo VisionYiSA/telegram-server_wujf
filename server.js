@@ -7,12 +7,12 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 
 passport.serializeUser(function(user, done) {
-  console.log("Serialize User");
+  // console.log("Serialize User");
   done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  console.log("Deserialize User");
+  // console.log("Deserialize User");
   for(var i=0; i < User.length ; i++){
     if(id === User[i].id){
       done(null, User[i]);
@@ -29,17 +29,25 @@ passport.use('local', new LocalStrategy({
       if(username === User[i].id && 
          password === User[i].password){
         found = true;
-        console.log('success');
-        console.log(User[i]);
+        // console.log('success');
+        // console.log(User[i]);
         return done(null, User[i]);
       }
     }
     if(found === false){
-      console.log('failed');
+      // console.log('failed');
       return done(null, false);
     }
   }
 ));
+
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    return res.send(403);
+  }
+}
 
 app.use(bodyParser());
 app.use(cookieParser());
@@ -163,7 +171,8 @@ app.get('/api/posts', function(req, res){
   res.send(200, {posts: Post});
 });
 // =========== CREATE post ===========
-app.post('/api/posts', function(req, res){
+
+app.post('/api/posts', ensureAuthenticated, function(req, res){
   var newPostId = Post.length+1;
   // console.log(req.body.post);
   // console.log("New Post id: "+newPostId);
