@@ -1,8 +1,51 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+
+passport.serializeUser(function(user, done) {
+  console.log("Serialize User");
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  console.log("Deserialize User");
+  for(var i=0; i < User.length ; i++){
+    if(id === User[i].id){
+      done(null, User[i]);
+    }
+  }
+});
+
+passport.use('local', new LocalStrategy({
+    usernameField: 'id'
+  },
+  function(username, password, done) {
+    var found = false;
+    for(var i=0; i < User.length ; i++){
+      if(username === User[i].id && 
+         password === User[i].password){
+        found = true;
+        console.log('success');
+        console.log(User[i]);
+        return done(null, User[i]);
+      }
+    }
+    if(found === false){
+      console.log('failed');
+      return done(null, false);
+    }
+  }
+));
 
 app.use(bodyParser());
+app.use(cookieParser());
+app.use(session({ secret: 'secret_key' }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 var Post = [
   {
@@ -79,24 +122,21 @@ app.get('/login', function(req, res){
   res.send('Login');
 });
 
-app.get('/api/users', function(req, res){
+app.get('/api/users', function(req, res, next){
   var username = req.query.id;
   var password = req.query.password;
   var operation = req.query.operation;
 
   if(operation == 'login'){
-    var found = false;
-    for(var i=0; i < User.length ; i++){
-      if(username === User[i].id && password === User[i].password){
-        // console.log(User[i]);
-        found = true;
-        return res.send(200, {users: [User[i]]});
-      }
-    }
-    if(found === false){
-      // console.log(username+' '+password+' '+operation);
-      res.send(400);
-    }
+    passport.authenticate('local', function(err, user, info) {
+      if (err) { return res.send(400); }
+      if (!user) { return res.send(400); }
+      req.login(user, function(err) {
+        if (err) { return res.send(400); }
+        console.log(user);
+        return res.send(200, {user: [user]});
+      });
+    })(req, res, next);
   }
 });
 
