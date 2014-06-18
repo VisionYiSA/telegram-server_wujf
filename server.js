@@ -126,7 +126,7 @@ app.post('/api/users', function(req, res){
 });
 
 // =========== Login ===========
-app.get('/login', function(req, res){
+app.get('/login', ensureAuthenticated, function(req, res){
   res.send('Login');
 });
 
@@ -141,7 +141,7 @@ app.get('/api/users', function(req, res, next){
       if (!user) { return res.send(400); }
       req.login(user, function(err) {
         if (err) { return res.send(400); }
-        console.log(user);
+        // console.log(user);
         return res.send(200, {user: [user]});
       });
     })(req, res, next);
@@ -161,7 +161,13 @@ app.get('/api/users/:user_id', function(req, res){
     res.send(400);
   }
 });
-
+// =========== Logout ===========
+app.get('/logout', function(req, res){
+  console.log('LOGOUT-server');
+  req.logout();
+  res.send(200);
+});
+// =========== Others ===========
 app.get('/api/resetpassword',  function(req, res){});
 app.post('/api/resetpassword', function(req, res){});
 app.get('/api/sentpassnotify', function(req, res){});
@@ -173,18 +179,19 @@ app.get('/api/posts', function(req, res){
 // =========== CREATE post ===========
 
 app.post('/api/posts', ensureAuthenticated, function(req, res){
-  var newPostId = Post.length+1;
-  // console.log(req.body.post);
-  // console.log("New Post id: "+newPostId);
-  var newPost = { 
-    id: newPostId,
-    body: req.body.post.body,
-    user: req.body.post.user,
-    date: req.body.post.date
-  };
-  Post.push(newPost);
-  res.send(200, {post: newPost});
-  // res.redirect('/api/posts')
+  if(req.user.id === req.body.post.user){
+    var newPostId = Post.length+1;
+    var newPost = { 
+      id: newPostId,
+      body: req.body.post.body,
+      user: req.body.post.user,
+      date: req.body.post.date
+    };
+    Post.push(newPost);
+    res.send(200, {post: newPost});
+  } else {
+    res.send(403);
+  }
 });
 // =========== DELETE post ===========
 app.delete('/api/posts/:post_id', function(req, res){
