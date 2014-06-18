@@ -17,3 +17,7 @@
 * **Step2 - Passport Authentication**
 * Installed `passport`, `passport-local`, `cookie-parser`, `express-session`.
 * Issue note [https://gist.github.com/yhagio/0e29815cd1e1f086242e](https://gist.github.com/yhagio/0e29815cd1e1f086242e)
+
+* **Step3 - Passport Authentication 2**
+* use `req.isAuthenticated` and implement `ensureAuthenticated` middleware in order to prevent publishing a post by unauthorized user
+* Issue note: [https://gist.github.com/yhagio/5e2b2d11076e8aede483](https://gist.github.com/yhagio/5e2b2d11076e8aede483)
