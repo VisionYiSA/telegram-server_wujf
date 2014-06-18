@@ -162,7 +162,7 @@ app.get('/api/users/:user_id', function(req, res){
   }
 });
 // =========== Logout ===========
-app.get('/logout', function(req, res){
+app.get('/api/logout', function(req, res){
   console.log('LOGOUT-server');
   req.logout();
   res.send(200);
