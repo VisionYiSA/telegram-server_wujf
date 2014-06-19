@@ -5,7 +5,26 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var mongoose = require('mongoose');
 
+// =========== Mongoose ===========
+mongoose.connect('mongodb://192.168.56.10/telegram', 
+  function(err){
+    if(err) return handleError(err);
+    console.log('***** Connected to MongoDB *****')
+});
+
+var schema = new mongoose.Schema({
+  _id:        String,
+  email:      String,
+  name:       String,
+  password:   String,
+  created_at: {type: Date, default: Date.now}
+});
+
+var User = mongoose.model('User', schema);
+
+// =========== Passport ===========
 passport.serializeUser(function(user, done) {
   // console.log("Serialize User");
   done(null, user.id);
@@ -13,31 +32,52 @@ passport.serializeUser(function(user, done) {
 
 passport.deserializeUser(function(id, done) {
   // console.log("Deserialize User");
-  for(var i=0; i < User.length ; i++){
-    if(id === User[i].id){
-      done(null, User[i]);
-    }
-  }
+  User.findById(id, function(err, user){
+    done(err, user);
+  });
+
+  // for(var i=0; i < User.length ; i++){
+  //   if(id === User[i].id){
+  //     done(null, User[i]);
+  //   }
+  // }
 });
 
 passport.use('local', new LocalStrategy({
     usernameField: 'id'
   },
   function(username, password, done) {
-    var found = false;
-    for(var i=0; i < User.length ; i++){
-      if(username === User[i].id && 
-         password === User[i].password){
-        found = true;
-        // console.log('success');
-        // console.log(User[i]);
-        return done(null, User[i]);
+    User.findOne({
+      '_id': username
+    }, function(err, user){
+      if(err){return done(err);}
+
+      if(!user){
+        return done(null, false);
       }
-    }
-    if(found === false){
-      // console.log('failed');
-      return done(null, false);
-    }
+
+      if(user.password != password){
+        return done(null, false);
+      }
+
+      return done(null, user);
+    });
+
+    // var found = false;
+    // for(var i=0; i < User.length ; i++){
+    //   if(username === User[i].id && 
+    //      password === User[i].password){
+    //     found = true;
+    //     // console.log('success');
+    //     // console.log(User[i]);
+    //     return done(null, User[i]);
+    //   }
+    // }
+    // if(found === false){
+    //   // console.log('failed');
+    //   return done(null, false);
+    // }
+
   }
 ));
 
@@ -49,12 +89,15 @@ function ensureAuthenticated(req, res, next) {
   }
 }
 
+// =========== Config ===========
 app.use(bodyParser());
 app.use(cookieParser());
 app.use(session({ secret: 'secret_key' }));
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+// =========== Fixed Data ===========
 var Post = [
   {
     id: 1,
@@ -111,22 +154,35 @@ app.get('/', function(req, res){
 });
 
 app.post('/api/users', function(req, res){
-  // console.log(req.body.user);
-  var userInfo = {      
-    id: req.body.user.id,
+  var newUser = new User({
+    _id: req.body.user.id,
     name: req.body.user.name,
     eamil: req.body.user.email,
     password: req.body.user.password,
     avatar: null
-  };
-  // console.log(userInfo);
-  User.push(userInfo);
-  res.send(200, {user: userInfo});
-  // res.redirect('/api/posts');
+  });
+  newUser.save(function(err){
+    if(err) return handleError(err);
+    console.log("Good");
+    res.send(200, {user: newUser});
+  });
+
+  // // console.log(req.body.user);
+  // var userInfo = {      
+  //   id: req.body.user.id,
+  //   name: req.body.user.name,
+  //   eamil: req.body.user.email,
+  //   password: req.body.user.password,
+  //   avatar: null
+  // };
+  // // console.log(userInfo);
+  // User.push(userInfo);
+  // res.send(200, {user: userInfo});
+  // // res.redirect('/api/posts');
 });
 
 // =========== Login ===========
-app.get('/login', ensureAuthenticated, function(req, res){
+app.get('/login', function(req, res){
   res.send('Login');
 });
 

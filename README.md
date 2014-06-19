@@ -21,3 +21,6 @@
 * **Step3 - Passport Authentication 2**
 * use `req.isAuthenticated` and implement `ensureAuthenticated` middleware in order to prevent publishing a post by unauthorized user
 * Issue note: [https://gist.github.com/yhagio/5e2b2d11076e8aede483](https://gist.github.com/yhagio/5e2b2d11076e8aede483)
+
+* **Step4 - MongoDB**
+* Ubuntu Installation of MongoDB Issue note: [https://gist.github.com/yhagio/fd118c34f5ca2289438d](https://gist.github.com/yhagio/fd118c34f5ca2289438d)
