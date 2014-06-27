@@ -21,3 +21,9 @@
 * **Step3 - Passport Authentication 2**
 * use `req.isAuthenticated` and implement `ensureAuthenticated` middleware in order to prevent publishing a post by unauthorized user
 * Issue note: [https://gist.github.com/yhagio/5e2b2d11076e8aede483](https://gist.github.com/yhagio/5e2b2d11076e8aede483)
+
+* **Step4 - MongoDB**
+* Comprehension check: [Explain everything that is happening on the backend](https://gist.github.com/yhagio/7394b91dfe236ef48814)
+* Ubuntu Installation of MongoDB Issue note: [https://gist.github.com/yhagio/dcc4bd40ac3a32ec5084](https://gist.github.com/yhagio/dcc4bd40ac3a32ec5084)
+* Changed the address of mongoose setting `mongoose.connect('mongodb://192.168.56.10/telegram'	` ip to localhost `mongoose.connect('mongodb://127.0.0.1/telegram'	`
+* MongoDB shell commands [https://gist.github.com/yhagio/ce335d4c5aa506b2399f](https://gist.github.com/yhagio/ce335d4c5aa506b2399f)

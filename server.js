@@ -5,105 +5,69 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var mongoose = require('mongoose');
 
-passport.serializeUser(function(user, done) {
-  // console.log("Serialize User");
+// =========== Mongoose ===========
+mongoose.connect('mongodb://127.0.0.1/telegram', 
+  function(err){
+    if(err) return console.log(err);
+    console.log('***** Connected to MongoDB *****')
+});
+
+// Pre-made Data
+var Post = [];
+
+// User schema
+var userSchema = new mongoose.Schema({
+  id:         String,
+  email:      String,
+  name:       String,
+  password:   String
+});
+
+var User = mongoose.model('User', userSchema);
+
+
+// =========== Passport ===========
+passport.serializeUser(function(user, done) { // Sets Cookie on login
   done(null, user.id);
 });
 
-passport.deserializeUser(function(id, done) {
-  // console.log("Deserialize User");
-  for(var i=0; i < User.length ; i++){
-    if(id === User[i].id){
-      done(null, User[i]);
-    }
-  }
+passport.deserializeUser(function(id, done) { // Check user's cookie
+  User.find({'id': id}, function(err, user){
+    done(err, user);
+  });
 });
 
 passport.use('local', new LocalStrategy({
     usernameField: 'id'
   },
   function(username, password, done) {
-    var found = false;
-    for(var i=0; i < User.length ; i++){
-      if(username === User[i].id && 
-         password === User[i].password){
-        found = true;
-        // console.log('success');
-        // console.log(User[i]);
-        return done(null, User[i]);
-      }
-    }
-    if(found === false){
-      // console.log('failed');
-      return done(null, false);
-    }
+    User.findOne({
+      'id': username
+    }, function(err, user){
+      if(err){ return done(err); }
+      if(!user){ return done(null, false); }
+      if(user.password != password){ return done(null, false); }
+      return done(null, user);
+    });
   }
 ));
 
 function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
+  if (req.isAuthenticated()) { // Check the cookie exists
     return next();
   } else {
     return res.send(403);
   }
 }
 
+// =========== Config ===========
 app.use(bodyParser());
 app.use(cookieParser());
 app.use(session({ secret: 'secret_key' }));
 app.use(passport.initialize());
 app.use(passport.session());
-
-var Post = [
-  {
-    id: 1,
-    body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mini',
-    user: 'will',
-    date: 'Tue, 06 May 2014 21:03:32 GMT'
-  },{
-    id: 2,
-    body: 'Salut! This is 2nd oldest post, from Joseph!',
-    user: 'joseph',
-    date: 'Sat, 10 May 2014 21:33:30 GMT'
-  },{
-    id: 3,
-    body: 'Hey everyone, I am Gal Gagot!',
-    user: 'gal',
-    date: 'Tue, 20 May 2014 22:33:32 GMT'
-  },{
-    id: 4,
-    body: 'What up! This is latest post!',
-    user: 'beyonce',
-    date: 'Thu, 29 May 2014 23:33:30 GMT'
-  }];
-
-var User = [
-  {
-    id: 'will',
-    name: 'Will Smith',
-    email: 'will@example.com',
-    password: 'password',
-    avatar: 'images/will.jpg'
-  },{
-    id: 'beyonce',
-    name: 'Beyonce Knowles',
-    email: 'beyonce@example.com',
-    password: 'password',
-    avatar: 'images/beyonce.jpeg'
-  },{
-    id: 'joseph',
-    name: 'Joseph Gordon-Levitt',
-    email: 'joseph@example.com',
-    password: 'password',
-    avatar: 'images/joseph.jpeg'
-  },{
-    id: 'gal',
-    name: 'Gal Gagot',
-    email: 'gal@example.com',
-    password: 'password',
-    avatar: 'images/gal.jpg'
-  }];
 
 // =========== Register ===========
 app.get('/', function(req, res){
@@ -111,22 +75,22 @@ app.get('/', function(req, res){
 });
 
 app.post('/api/users', function(req, res){
-  // console.log(req.body.user);
-  var userInfo = {      
+
+  var newUser = new User({
     id: req.body.user.id,
     name: req.body.user.name,
     eamil: req.body.user.email,
-    password: req.body.user.password,
-    avatar: null
-  };
-  // console.log(userInfo);
-  User.push(userInfo);
-  res.send(200, {user: userInfo});
-  // res.redirect('/api/posts');
+    password: req.body.user.password
+  });
+
+  newUser.save(function(err, result){
+    if(err) return console.log(err);
+    return res.send(200, {user: result});
+  });
 });
 
 // =========== Login ===========
-app.get('/login', ensureAuthenticated, function(req, res){
+app.get('/login', function(req, res){
   res.send('Login');
 });
 
@@ -134,14 +98,12 @@ app.get('/api/users', function(req, res, next){
   var username = req.query.id;
   var password = req.query.password;
   var operation = req.query.operation;
-
   if(operation == 'login'){
     passport.authenticate('local', function(err, user, info) {
       if (err) { return res.send(400); }
       if (!user) { return res.send(400); }
-      req.login(user, function(err) {
+      req.login(user, function(err) { // Set cookie here 
         if (err) { return res.send(400); }
-        // console.log(user);
         return res.send(200, {user: [user]});
       });
     })(req, res, next);
@@ -150,16 +112,10 @@ app.get('/api/users', function(req, res, next){
 
 app.get('/api/users/:user_id', function(req, res){
   var username = req.params.user_id;
-  var found = false;
-  for(var i=0; i < User.length ; i++){
-    if(username === User[i].id){
-      found = true;
-      res.send(200, {user: User[i]});
-    }
-  } 
-  if(found === false){
-    res.send(400);
-  }
+  User.find({'id': username}, function(err, result){
+    if(err) console.log(err);
+    return res.send(200, {user: result});
+  });
 });
 // =========== Logout ===========
 app.get('/api/logout', function(req, res){
@@ -176,8 +132,8 @@ app.get('/api/sentpassnotify', function(req, res){});
 app.get('/api/posts', function(req, res){
   res.send(200, {posts: Post});
 });
-// =========== CREATE post ===========
 
+// =========== CREATE post ===========
 app.post('/api/posts', ensureAuthenticated, function(req, res){
   if(req.user.id === req.body.post.user){
     var newPostId = Post.length+1;
@@ -195,16 +151,12 @@ app.post('/api/posts', ensureAuthenticated, function(req, res){
 });
 // =========== DELETE post ===========
 app.delete('/api/posts/:post_id', function(req, res){
-  var postToDelete = req.params.post_id;
-  // console.log("Delete Post id: "+req.params.post_id);
   var found = false;
   for(var i=0; i < Post.length ; i++){
     if(postToDelete == Post[i].id){
-      // console.log("Post body in array: "+Post[i].body);
       found = true;
       Post.splice(Post.indexOf(Post[i]), 1);
       res.send(200);
-      // res.redirect('/api/posts');
     }
   } 
   if(found == false) res.send(400);
