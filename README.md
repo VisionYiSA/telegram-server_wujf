@@ -27,3 +27,8 @@
 * Ubuntu Installation of MongoDB Issue note: [https://gist.github.com/yhagio/dcc4bd40ac3a32ec5084](https://gist.github.com/yhagio/dcc4bd40ac3a32ec5084)
 * Changed the address of mongoose setting `mongoose.connect('mongodb://192.168.56.10/telegram'	` ip to localhost `mongoose.connect('mongodb://127.0.0.1/telegram'	`
 * MongoDB shell commands [https://gist.github.com/yhagio/ce335d4c5aa506b2399f](https://gist.github.com/yhagio/ce335d4c5aa506b2399f)
+
+* **Step5 - Connect-mongostore / Code Design**
+* `id` and `_id` gist: [https://gist.github.com/yhagio/9702f9a9d9c54abe8352](https://gist.github.com/yhagio/9702f9a9d9c54abe8352)
+* [Install connect-mongostore](https://github.com/diversario/connect-mongostore)
+* Modules: Database, Routes, Passport, API Modules [https://gist.github.com/yhagio/a0df02003c75f6887fc5](https://gist.github.com/yhagio/a0df02003c75f6887fc5)
