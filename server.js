@@ -62,6 +62,17 @@ function ensureAuthenticated(req, res, next) {
     return res.send(403);
   }
 }
+// ==== beforeModel Check if authenticated user exists ====
+app.get('/api/checkLoggedIn', function(req, res){
+  console.log(req.user);
+  if (req.user){
+    console.log(req.user);
+    return res.send(200, {user: req.user});
+  } else {
+    console.log(req);
+    return res.send(200, {user: null});
+  }
+});
 
 // =========== Config ===========
 app.use(bodyParser());
