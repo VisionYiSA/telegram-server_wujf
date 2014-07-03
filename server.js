@@ -31,11 +31,14 @@ var User = mongoose.model('User', userSchema);
 
 // =========== Passport ===========
 passport.serializeUser(function(user, done) { // Sets Cookie on login
+  // console.log('serialize: ' + user._id);
   done(null, user._id);
 });
 
 passport.deserializeUser(function(id, done) { // Check user's cookie
-  User.find({'_id': id}, function(err, user){
+  // console.log('deserializeID: ' + id);
+  User.findOne({'_id': id}, function(err, user){ // instead of find()
+    // console.log('deserializeUser: '+ user);
     done(err, user);
   });
 });
@@ -57,28 +60,35 @@ passport.use('local', new LocalStrategy({
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { // Check the cookie exists
+    // console.log('User is authenticated');
+    // console.log(req.user);
     return next();
   } else {
+    // console.log('User is NOT authenticated');
     return res.send(403);
   }
 }
 // ==== beforeModel Check if authenticated user exists ====
-app.get('/api/checkLoggedIn', function(req, res){
-  console.log(req.user);
-  if (req.user){
-    console.log(req.user);
-    return res.send(200, {user: req.user});
-  } else {
-    console.log(req);
-    return res.send(200, {user: null});
-  }
-});
+  app.get('/api/checkLoggedIn', function(req, res){
+    console.log('req.user: ' + req.user);
+    console.log('Before req.user : isAuthenticated = ' + req.isAuthenticated());
+
+    if (req.user){
+
+      console.log('Inside if: ' + req.user);
+      return res.send(200, {user: [req.user]});
+    } else {
+      // console.log(req);
+      return res.send(200, {user: null});
+    }
+  });
 
 // =========== Config ===========
 app.use(bodyParser());
 app.use(cookieParser());
 app.use(session({ 
   secret: 'secret_key',
+  cookie: {maxAge: 1209600000},
   store: new MongoStore({'db': 'telegram'})
 }));
 app.use(passport.initialize());
@@ -165,7 +175,16 @@ app.get('/api/posts', function(req, res){
 
 // =========== CREATE post ===========
 app.post('/api/posts', ensureAuthenticated, function(req, res){
-  if(req.user.id === req.body.post.user){
+  // console.log('CreatePost: ' + req.user);
+  // console.log('req.body.post.user: ' + req.body.post.user);
+
+  // console.log("Before id is matched");
+  // console.log(req.user._id == req.body.post.user);
+
+  if(req.user._id == req.body.post.user){
+
+    // console.log("id is matched");
+
     var newPostId = Post.length+1;
     var newPost = { 
       id: newPostId,
