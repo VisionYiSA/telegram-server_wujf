@@ -32,3 +32,5 @@
 * `id` and `_id` gist: [https://gist.github.com/yhagio/9702f9a9d9c54abe8352](https://gist.github.com/yhagio/9702f9a9d9c54abe8352)
 * [Install connect-mongostore](https://github.com/diversario/connect-mongostore)
 * Modules: Database, Routes, Passport, API Modules [https://gist.github.com/yhagio/a0df02003c75f6887fc5](https://gist.github.com/yhagio/a0df02003c75f6887fc5)
+* Code organization
+-- Moved User Schema
