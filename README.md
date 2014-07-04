@@ -32,5 +32,15 @@
 * `id` and `_id` gist: [https://gist.github.com/yhagio/9702f9a9d9c54abe8352](https://gist.github.com/yhagio/9702f9a9d9c54abe8352)
 * [Install connect-mongostore](https://github.com/diversario/connect-mongostore)
 * Modules: Database, Routes, Passport, API Modules [https://gist.github.com/yhagio/a0df02003c75f6887fc5](https://gist.github.com/yhagio/a0df02003c75f6887fc5)
+* changed from `===` to `==` and `id` to `_id` in the `/api/posts` route
+```
+// before
+if(req.user.id === req.body.post.user)
+// After
+if(req.user._id == req.body.post.user)
+// req.user type is object, req.body.post.user type is string
+// mongo objectID
+```
+* Post Schema issue [https://gist.github.com/yhagio/5f41cd1f15a67c3d7053](https://gist.github.com/yhagio/5f41cd1f15a67c3d7053)
 * Code organization
 -- Moved User Schema

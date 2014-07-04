@@ -1,10 +1,26 @@
 var Post = require('./models/post');
 
 exports.getPosts = function(req, res){
+
   Post.find({}).sort({date:-1}).limit(20).exec(function(err, posts){
     if(err) console.log(err);
-    console.log(posts);
-    return res.send(200, {posts: posts});
+    // console.log("======= before emberPosts ========");
+    // console.log(posts);
+    var emberPosts = [];
+    posts.forEach(
+      function(post){
+        var emberPost = {
+          'id':    post._id,
+          'body':  post.body,
+          'user':  post.user,
+          'date':  post.date     
+        }
+        emberPosts.push(emberPost);
+      }
+    )
+    // console.log("======= After emberPosts ========");
+    // console.log(emberPosts);
+    return res.send(200, {posts: emberPosts});
   });
 };
  
@@ -17,8 +33,15 @@ exports.publishPost = function(req, res){
  
     newPost.save(function(err, result){
       if(err) return console.log(err);
-      return res.send(200, {post: result});
+      var emberPost = {
+          'id':       result._id,
+          'body':     result.body,
+          'user':     result.user,
+          'date':     result.date
+        };
+      return res.send(200, {post: [emberPost]});
     });
+
   } else {
     res.send(403);
   }
