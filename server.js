@@ -5,8 +5,6 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session');
 
 var passport = require('passport');
-// var LocalStrategy = require('passport-local').Strategy;
-// require('./authentication')(passport);
 var ensureAuthenticated = require('./ensureAuthenticated');
 
 var mongoose = require('mongoose');
@@ -48,8 +46,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-
+// =========== Routes ============
 app.get('/', function(req, res){res.send('Register');});
 app.post('/api/users', userOperation.register);
 app.get('/api/login', function(req, res){res.send('Login');});
@@ -61,54 +58,10 @@ app.get('/api/resetpassword',  function(req, res){});
 app.post('/api/resetpassword', function(req, res){});
 app.get('/api/sentpassnotify', function(req, res){});
 
-
-// var Post = [];
-// =========== GET Posts ===========
-// app.get('/api/posts', function(req, res){ res.send(200, {posts: Post});});
-
-// app.post('/api/posts', ensureAuthenticated, function(req, res){
-//   // console.log('CreatePost: ' + req.user);
-//   // console.log('req.body.post.user: ' + req.body.post.user);
-
-//   // console.log("Before id is matched");
-//   // console.log(req.user._id == req.body.post.user);
-
-//   if(req.user._id == req.body.post.user){
-
-//     // console.log("id is matched");
-
-//     var newPostId = Post.length+1;
-//     var newPost = { 
-//       id: newPostId,
-//       body: req.body.post.body,
-//       user: req.body.post.user,
-//       date: req.body.post.date
-//     };
-//     Post.push(newPost);
-//     res.send(200, {post: newPost});
-//   } else {
-//     res.send(403);
-//   }
-// });
-
-// app.delete('/api/posts/:post_id', function(req, res){
-//   var found = false;
-//   for(var i=0; i < Post.length ; i++){
-//     if(postToDelete == Post[i].id){
-//       found = true;
-//       Post.splice(Post.indexOf(Post[i]), 1);
-//       res.send(200);
-//     }
-//   } 
-//   if(found == false) res.send(400);
-// });
-
-
 app.get('/api/posts', postOperation.getPosts);
 app.post('/api/posts', ensureAuthenticated, postOperation.publishPost);
 app.delete('/api/posts/:post_id', postOperation.deletePost);
 
-// =========== User page ===========
 app.get('/api/users/:user_id/following', function(req, res){
   res.send(200, {user: req.params.user_id});
 });

@@ -1,7 +1,6 @@
 var Post = require('./models/post');
 
 exports.getPosts = function(req, res){
-
   Post.find({}).sort({date:-1}).limit(20).exec(function(err, posts){
     if(err) console.log(err);
     // console.log("======= before emberPosts ========");
@@ -18,7 +17,7 @@ exports.getPosts = function(req, res){
         emberPosts.push(emberPost);
       }
     )
-    // console.log("======= After emberPosts ========");
+    // console.log("======= After pushed emberPosts ========");
     // console.log(emberPosts);
     return res.send(200, {posts: emberPosts});
   });
