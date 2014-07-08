@@ -1,6 +1,7 @@
 var passport = require('passport');
 require('./passport')(passport);
 var User = require('./models/user');
+var Post = require('./models/post');
 
 exports.register = function(req, res){
   var newUser = new User({
@@ -58,6 +59,26 @@ exports.getUser = function(req, res){
         'email':    result.email
       }; 
       return res.send(200, {user: emberUser});   
+    } else {
+      return res.send(404);
+    }
+  });
+
+  Post.find({'user': userId}, function(err, posts){
+    if(result != null) {
+      var emberUserPosts = [];
+      posts.forEach(
+        function(post){
+          var emberUserPost = {
+            'id':    post._id,
+            'body':  post.body,
+            'user':  post.user,
+            'date':  post.date     
+          }
+          emberUserPosts.push(emberUserPost);
+        }
+      )
+      return res.send(200, {posts: emberPosts});   
     } else {
       return res.send(404);
     }

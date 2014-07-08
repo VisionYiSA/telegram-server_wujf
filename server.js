@@ -69,13 +69,8 @@ app.get('/api/posts', postOperation.getPosts);
 app.post('/api/posts', ensureAuthenticated, postOperation.publishPost);
 app.delete('/api/posts/:post_id', postOperation.deletePost);
 
-app.get('/api/users/:user_id/following', function(req, res){
-  res.send(200, {user: req.params.user_id});
-});
-
-app.get('/api/users/:user_id/followers', function(req, res){
-  res.send(200, {user: req.params.user_id});
-});
+// app.get('/api/users/:user_id/following', userOperation.getFollowing);
+// app.get('/api/users/:user_id/followers', userOperation.getFollowers);
 
 var server = app.listen(3000, function(){
   console.log('Listening on port %d', server.address().port);
