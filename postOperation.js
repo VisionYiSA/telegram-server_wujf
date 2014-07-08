@@ -19,12 +19,12 @@ exports.getPosts = function(req, res){
     )
     // console.log("======= After pushed emberPosts ========");
     // console.log(emberPosts);
-    return res.send(200, {posts: emberPosts});
+    return res.send(200, {posts: emberPosts}); // Array - plural
   });
 };
  
 exports.publishPost = function(req, res){
-  if(req.user._id == req.body.post.user){
+  if(req.user.username == req.body.post.user){
     var newPost = new Post({
       body: req.body.post.body,
       user: req.body.post.user,
@@ -38,7 +38,7 @@ exports.publishPost = function(req, res){
           'user':     result.user,
           'date':     result.date
         };
-      return res.send(200, {post: [emberPost]});
+      return res.send(200, {post: emberPost}); // Not array - singular
     });
 
   } else {
