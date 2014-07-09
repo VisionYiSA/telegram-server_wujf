@@ -44,3 +44,5 @@ if(req.user._id == req.body.post.user)
 * Post Schema issue [https://gist.github.com/yhagio/5f41cd1f15a67c3d7053](https://gist.github.com/yhagio/5f41cd1f15a67c3d7053)
 * Code organization
 -- Moved User Schema
+
+* 
