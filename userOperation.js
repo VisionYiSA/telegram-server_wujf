@@ -1,7 +1,6 @@
 var passport = require('passport');
 require('./passport')(passport);
 var User = require('./models/user');
-var Post = require('./models/post');
 
 exports.register = function(req, res){
   var newUser = new User({
@@ -49,7 +48,7 @@ exports.login = function(req, res, next){
 exports.getUser = function(req, res){
   var userId = req.params.user_id;
   User.findOne({'username': userId}, function(err, result){
-    console.log('====== result =======');
+    // console.log('====== result =======');
     // console.log(result);
 
     if(result != null) {
@@ -58,37 +57,9 @@ exports.getUser = function(req, res){
         'username': result.username,
         'name':     result.name,
         'email':    result.email
-      }; 
+      };   
 
-      var emberUserPosts = [];
-      
-      Post.find({'user': userId}, function(err, posts){
-        console.log('====== posts =======');
-        console.log(posts);
-
-        if(posts != null) {
-          posts.forEach(
-            function(post){
-
-              var emberUserPost = {
-                'id':    post._id,
-                'body':  post.body,
-                'user':  post.user,
-                'date':  post.date     
-              }
-              console.log('===++= emberUserPost ==++===');
-              console.log(emberUserPost);
-
-              emberUserPosts.push(emberUserPost);
-              console.log('====== emberUserPoststs =======');
-              console.log(emberUserPosts);
-            }
-          )
-        }
-      });
-      
-
-      return res.send(200, {user: emberUser, posts: emberUserPosts});   
+      return res.send(200, {user: emberUser});
     } else {
       console.log('====== NOP =======');
       return res.send(404);

@@ -43,6 +43,16 @@ if(req.user._id == req.body.post.user)
 ```
 * Post Schema issue [https://gist.github.com/yhagio/5f41cd1f15a67c3d7053](https://gist.github.com/yhagio/5f41cd1f15a67c3d7053)
 * Code organization
--- Moved User Schema
+* Changed back the Mongo ObjectID to username to simplify the process. Ember finds user by user_id = username.
+* Fixed persistence issue: moved the entire routes code AFTER `config`
 
-* 
+* Fixed PostsPage issue (username is missing):
+```
+1. Check the console log on browser
+2. Network -> response
+3. Find which api route in the backend handles it
+4. Put console.log() in the backend to make sure it returns the correct response.
+Keys: ember styled object? Array/Object?
+```
+
+* User page routes and query
