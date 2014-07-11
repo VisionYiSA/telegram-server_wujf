@@ -70,7 +70,6 @@ app.get('/api/posts', postOperation.getPosts);
 app.post('/api/posts', ensureAuthenticated, postOperation.publishPost);
 app.delete('/api/posts/:post_id', postOperation.deletePost);
 
-app.get('/api/users/:user_id', userPageOperation.getUserPosts);
 // app.get('/api/users/:user_id/following', userOperation.getFollowing);
 // app.get('/api/users/:user_id/followers', userOperation.getFollowers);
 

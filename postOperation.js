@@ -1,26 +1,56 @@
 var Post = require('./models/post');
 
 exports.getPosts = function(req, res){
-  Post.find({}).sort({date:-1}).limit(20).exec(function(err, posts){
-    if(err) console.log(err);
-    // console.log("======= before emberPosts ========");
-    // console.log(posts);
-    var emberPosts = [];
-    posts.forEach(
-      function(post){
-        var emberPost = {
-          'id':    post._id,
-          'body':  post.body,
-          'user':  post.user,
-          'date':  post.date     
-        }
-        emberPosts.push(emberPost);
+  var userId = req.query.user;
+  // console.log(req.query);
+  var emberUserPosts = [];
+  if(userId){
+    Post.find({'user': userId}).sort({date:-1}).limit(20).exec(function(err, posts){
+      // console.log('====== user posts =======');
+      // console.log(posts);
+      if(posts != null) {
+        posts.forEach(
+          function(post){
+            var emberUserPost = {
+              'id':    post._id,
+              'body':  post.body,
+              'user':  post.user,
+              'date':  post.date     
+            }
+            // console.log('===++= emberUserPost ==++===');
+            // console.log(emberUserPost);
+            emberUserPosts.push(emberUserPost);
+          }
+        )
       }
-    )
-    // console.log("======= After pushed emberPosts ========");
-    // console.log(emberPosts);
-    return res.send(200, {posts: emberPosts}); // Array - plural
-  });
+      // console.log('====== emberUserPoststs =======');
+      // console.log(emberUserPosts);
+      return res.send(200, {posts: emberUserPosts}); 
+    });
+  } else {
+    Post.find({}).sort({date:-1}).limit(20).exec(function(err, posts){
+      // console.log('====== user posts =======');
+      // console.log(posts);
+      if(posts != null) {
+        posts.forEach(
+          function(post){
+            var emberUserPost = {
+              'id':    post._id,
+              'body':  post.body,
+              'user':  post.user,
+              'date':  post.date     
+            }
+            // console.log('===++= emberUserPost ==++===');
+            // console.log(emberUserPost);
+            emberUserPosts.push(emberUserPost);
+          }
+        )
+      }
+      // console.log('====== emberUserPoststs =======');
+      // console.log(emberUserPosts);
+      return res.send(200, {posts: emberUserPosts}); 
+    });
+  }
 };
  
 exports.publishPost = function(req, res){
