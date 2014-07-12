@@ -27,3 +27,36 @@
 * Ubuntu Installation of MongoDB Issue note: [https://gist.github.com/yhagio/dcc4bd40ac3a32ec5084](https://gist.github.com/yhagio/dcc4bd40ac3a32ec5084)
 * Changed the address of mongoose setting `mongoose.connect('mongodb://192.168.56.10/telegram'	` ip to localhost `mongoose.connect('mongodb://127.0.0.1/telegram'	`
 * MongoDB shell commands [https://gist.github.com/yhagio/ce335d4c5aa506b2399f](https://gist.github.com/yhagio/ce335d4c5aa506b2399f)
+
+* **Step5 - Connect-mongostore / Code Design**
+* `id` and `_id` gist: [https://gist.github.com/yhagio/9702f9a9d9c54abe8352](https://gist.github.com/yhagio/9702f9a9d9c54abe8352)
+* [Install connect-mongostore](https://github.com/diversario/connect-mongostore)
+* Modules: Database, Routes, Passport, API Modules [https://gist.github.com/yhagio/a0df02003c75f6887fc5](https://gist.github.com/yhagio/a0df02003c75f6887fc5)
+* changed from `===` to `==` and `id` to `_id` in the `/api/posts` route
+```
+// before
+if(req.user.id === req.body.post.user)
+// After
+if(req.user._id == req.body.post.user)
+// req.user type is object, req.body.post.user type is string
+// mongo objectID
+```
+* Post Schema issue [https://gist.github.com/yhagio/5f41cd1f15a67c3d7053](https://gist.github.com/yhagio/5f41cd1f15a67c3d7053)
+* Code organization
+* Changed back the Mongo ObjectID to username to simplify the process. Ember finds user by user_id = username.
+* Fixed persistence issue: moved the entire routes code AFTER `config`
+
+* Fixed PostsPage issue (username is missing):
+```
+1. Check the console log on browser
+2. Network -> response
+3. Find which api route in the backend handles it
+4. Put console.log() in the backend to make sure it returns the correct response.
+Keys: ember styled object? Array/Object?
+```
+
+* User page routes and query :[https://github.com/yhagio/telegram-server/commit/10c4c5ef2ab2007a598bf875290cbc2e2eb022e3](https://github.com/yhagio/telegram-server/commit/10c4c5ef2ab2007a598bf875290cbc2e2eb022e3)
+
+Step-6
+
+* Follow others: gists - [https://gist.github.com/yhagio/605e5baace6854b1ec68](https://gist.github.com/yhagio/605e5baace6854b1ec68)
