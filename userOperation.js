@@ -11,14 +11,16 @@ exports.register = function(req, res){
   });
 
   newUser.save(function(err, result){
-    if(err) return console.log(err);
-    var emberUser = {
-      'id':       result.username, // _id
-      'username': result.username,
-      'name':     result.name,
-      'email':    result.email
-    };
-    return res.send(200, {user: emberUser});
+    req.login(result, function(err) { // Set cookie here 
+      if (err) { return res.send(400); }
+      var emberUser = {
+        'id':       result.username, // _id
+        'username': result.username,
+        'name':     result.name,
+        'email':    result.email
+      };   
+      return res.send(200, {user: [emberUser]});
+    });
   });
 };
 
