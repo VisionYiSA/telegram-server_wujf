@@ -3,6 +3,7 @@ require('./passport')(passport);
 var User = require('./models/user');
 
 exports.register = function(req, res){
+  // console.log(req.body.user);
   var newUser = new User({
     username: req.body.user.username,
     name: req.body.user.name,
@@ -11,6 +12,7 @@ exports.register = function(req, res){
   });
 
   newUser.save(function(err, result){
+    // console.log(result);
     req.login(result, function(err) { // Set cookie here 
       if (err) { return res.send(400); }
       var emberUser = {

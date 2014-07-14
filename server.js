@@ -70,7 +70,8 @@ app.get('/api/posts', postOperation.getPosts);
 app.post('/api/posts', ensureAuthenticated, postOperation.publishPost);
 app.delete('/api/posts/:post_id', postOperation.deletePost);
 
-// app.get('/api/users/:user_id/following', userOperation.getFollowing);
+app.get('/api/follow', userPageOperation.follow);
+app.get('/api/users/:user_id/following', userOperation.getFollowingUsers);
 // app.get('/api/users/:user_id/followers', userOperation.getFollowers);
 
 var server = app.listen(3000, function(){
