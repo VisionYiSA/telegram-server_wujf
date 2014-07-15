@@ -37,4 +37,44 @@ exports.follow = function(req, res, next){
 
 exports.getFollowingUsers = function(req, res){
 	// return the followings array
+	// var thisUser = req.query.user;
+	// var followingUsers = [];
+	// User.findOne({'username': thisUser}, function(err, theUser){
+	// 	if(theUser){
+	// 		theUser.followings.forEach(function(eachUser){
+	// 			User.find({'username': eachUser}, function(err, oneUser){
+	// 				if(oneUser){
+	// 					var emberUser = {
+	// 		        'id':       oneUser.username,
+	// 		        'username': oneUser.username
+	// 					}
+	// 					followingUsers.push(emberUser);
+	// 				}
+	// 			});
+	// 		});
+	// 		return res.send(200, {users: followingUsers});
+	// 	} else {
+	// 		return res.send(404);
+	// 	}
+	// });
+	
+	var thisUser = req.query.user;
+	var emberFollwingUsers = [];
+	User.find({'followings': thisUser}, function(err, theUsers){
+		if(theUsers){
+      theUsers.forEach(
+        function(user){
+          var theUser = {
+            'id':    		 user.username,
+            'username':  user.username   
+          }
+          emberFollwingUsers.push(theUser);
+        }
+      )
+			return res.send(200, {users: emberFollwingUsers});
+		} else {
+			return res.send(404);
+		};
+	});
+	
 };

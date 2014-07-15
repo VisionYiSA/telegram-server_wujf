@@ -3,7 +3,7 @@ require('./passport')(passport);
 var User = require('./models/user');
 
 exports.register = function(req, res){
-  // console.log(req.body.user);
+  console.log(req.body.user);
   var newUser = new User({
     username: req.body.user.username,
     name: req.body.user.name,
