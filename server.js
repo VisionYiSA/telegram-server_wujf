@@ -58,7 +58,7 @@ app.get('/api/checkLoggedIn', function(req, res){
 app.get('/', function(req, res){res.send('Register');});
 app.post('/api/users', userOperation.register);
 app.get('/api/login', function(req, res){res.send('Login');});
-app.get('/api/users', userOperation.login);
+app.get('/api/users', userOperation.loginOrGetFollowingsFollowers);
 app.get('/api/users/:user_id', userOperation.getUser);
 app.get('/api/logout', userOperation.logout);
 
@@ -71,7 +71,7 @@ app.post('/api/posts', ensureAuthenticated, postOperation.publishPost);
 app.delete('/api/posts/:post_id', postOperation.deletePost);
 
 app.get('/api/follow', userPageOperation.follow);
-app.get('/api/users/:user_id/following', userPageOperation.getFollowingUsers);
+// app.get('/api/users/:user_id/following', userPageOperation.getFollowingUsers);
 // app.get('/api/users/:user_id/followers', userPageOperation.getFollowers);
 
 var server = app.listen(3000, function(){

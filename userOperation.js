@@ -26,10 +26,12 @@ exports.register = function(req, res){
   });
 };
 
-exports.login = function(req, res, next){
-  var username  = req.query.username;
-  var password  = req.query.password;
-  var operation = req.query.operation;
+exports.loginOrGetFollowingsFollowers = function(req, res, next){
+  var username      = req.query.username,
+      password      = req.query.password,
+      operation     = req.query.operation,
+      follower      = req.query.followers,
+      followingUser = req.query.followings;
 
   if(operation == 'login'){
     passport.authenticate('local', function(err, user, info) {
@@ -46,6 +48,52 @@ exports.login = function(req, res, next){
         return res.send(200, {user: [emberUser]});
       });
     })(req, res, next);
+
+  // ======= GET Following users (users that current URL user follows)=======
+
+  } else if(follower){
+    var emberFollwingUsers = [];
+    // console.log("follower : "+follower);
+    User.find({'followers': follower}, function(err, theUsers){
+      // console.log("theUsers : "+theUsers);
+      if(theUsers){
+        theUsers.forEach(
+          function(user){
+            var eachUser = {
+              'id':        user.username,
+              'username':  user.username   
+            }
+            emberFollwingUsers.push(eachUser);
+          }
+        )
+        return res.send(200, {users: emberFollwingUsers});
+      } else {
+        return res.send(404);
+      };
+    });
+  }
+  // ======= GET Followers (users that follows current URL user)=============
+
+  else if(followingUser){
+    var emberFollowers = [];
+    // console.log("followingUser : "+followingUser);
+    User.find({'followings': followingUser}, function(err, theUsers){
+      // console.log("theUsers : "+theUsers);
+      if(theUsers){
+        theUsers.forEach(
+          function(user){
+            var eachUser = {
+              'id':        user.username,
+              'username':  user.username   
+            }
+            emberFollowers.push(eachUser);
+          }
+        )
+        return res.send(200, {users: emberFollowers});
+      } else {
+        return res.send(404);
+      };
+    });
   }
 };
 
