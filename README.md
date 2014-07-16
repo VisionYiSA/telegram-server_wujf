@@ -57,6 +57,8 @@ Keys: ember styled object? Array/Object?
 
 * User page routes and query :[https://github.com/yhagio/telegram-server/commit/10c4c5ef2ab2007a598bf875290cbc2e2eb022e3](https://github.com/yhagio/telegram-server/commit/10c4c5ef2ab2007a598bf875290cbc2e2eb022e3)
 
-Step-6
+**Step-6 - Followership**
 
-* Follow others: gists - [https://gist.github.com/yhagio/605e5baace6854b1ec68](https://gist.github.com/yhagio/605e5baace6854b1ec68)
+**Follow others**: gists - [https://gist.github.com/yhagio/605e5baace6854b1ec68](https://gist.github.com/yhagio/605e5baace6854b1ec68)
+* Follow function
+* At URL `users/:username/followings` Returns the following users of the user(:username), similar for `/followers`
