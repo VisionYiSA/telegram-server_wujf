@@ -1,7 +1,8 @@
 var passport = require('passport');
 require('./passport')(passport);
-var User = require('./models/user');
-var Post = require('./models/post');
+var async = require("async"),
+		User = require('./models/user'),
+		Post = require('./models/post');
 
 exports.follow = function(req, res, next){
 	// console.log("User to follow = " + req.query.user);
@@ -11,8 +12,8 @@ exports.follow = function(req, res, next){
 	// == Store the profile user at ths url to loggedIn user's followerings ==
 	User.findOne({'username': loggedInUser}, function(err, result){
 		// console.log("Before push result = "+ result);
-		if(result) {
-			result.followings.push(newFollowingUser);
+		if(result && result.followees.indexOf(newFollowingUser) < 0) {
+			result.followees.push(newFollowingUser);
 			// console.log("After push result = " + result);
 			result.save(function(err, user){
 				// console.log('save : '+user);
@@ -21,7 +22,7 @@ exports.follow = function(req, res, next){
 		      // console.log("==== Store loggedIn user to following user's followers ====")
 		      User.findOne({'username': newFollowingUser}, function(err, followee){
 		      	// console.log("followee : " + followee);
-		      	if(followee){
+		      	if(followee && followee.followers.indexOf(loggedInUser) < 0){
 		      		followee.followers.push(loggedInUser);
 		      		followee.save(function(err, aUser){
 		      			// console.log("Saved : " + aUser);
@@ -45,13 +46,15 @@ exports.follow = function(req, res, next){
 exports.unfollow = function(req, res, next){
 	var userToUnfollow = req.query.user;
 	var loggedInUser = req.user.username;
-	// == Remove the profile user at ths url from loggedIn user's followerings ==
+	console.log('== Remove the profile user at ths url from loggedIn user s followerings ===');
+	console.log('userToUnfollow : '+userToUnfollow);
+	console.log('loggedInUser : '+loggedInUser);
 	User.findOne({'username': loggedInUser}, function(err, result){
-		// console.log("Before push result = "+ result);
+		console.log("Before push result = "+ result);
 		if(result) {
-			var index = result.followings.indexOf(userToUnfollow);
+			var index = result.followees.indexOf(userToUnfollow);
 			if(index > -1){
-				result.followings.splice(index, 1);
+				result.followees.splice(index, 1);
 				result.save(function(err, user){
 					// console.log('save : '+user);
 					if(user) { 

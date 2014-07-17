@@ -71,8 +71,7 @@ app.post('/api/posts', ensureAuthenticated, postOperation.publishPost);
 app.delete('/api/posts/:post_id', postOperation.deletePost);
 
 app.get('/api/follow', userPageOperation.follow);
-// app.get('/api/users/:user_id/following', userPageOperation.getFollowingUsers);
-// app.get('/api/users/:user_id/followers', userPageOperation.getFollowers);
+app.get('/api/unfollow', userPageOperation.unfollow);
 
 var server = app.listen(3000, function(){
   console.log('Listening on port %d', server.address().port);

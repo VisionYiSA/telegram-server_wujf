@@ -1,15 +1,21 @@
-// Check if the current user follows a user
-var isFollower = function(mongoUser, currentUser){
-	if(mongoUser.followers.indexOf(currentUser)){
+// Check if the current user follows mongoUser
+var isFollowed = function(mongoUser, currentUser){
+	console.log('=== isFollower ===');
+	console.log('mongoUser : '+mongoUser);
+	console.log('currentUser : '+currentUser);
+	if(mongoUser.followees.indexOf(currentUser)){
 		return true;
 	} else {
 		return false;
 	}
 };
 
-// Check if a user follows the current user
-var isFollowed = function(mongoUser, currentUser){
-	if(mongoUser.followees.indexOf(currentUser)){
+// Check if mongoUser follows the current user
+var isFollower = function(mongoUser, currentUser){
+	console.log('=== isFollowed ===');
+	console.log('mongoUser : '+mongoUser);
+	console.log('currentUser : '+currentUser);
+	if(mongoUser.followers.indexOf(currentUser)){
 		return true;
 	} else {
 		return false;
@@ -22,8 +28,8 @@ exports.emberUser = function(mongoUser, currentUser){
 		'username': mongoUser.username,
 		'name': 		mongoUser.name,
 		'email': 		mongoUser.email,
-		'followedByCurrentUser': currentUser ? isFollower(mongoUser, currentUser) : false,
-		'followingCurrentUser':  currentUser ? isFollowed(mongoUser, currentUser) : false
+		'followedByCurrentUser': currentUser ? isFollowed(mongoUser, currentUser) : false,
+		'followingCurrentUser':  currentUser ? isFollower(mongoUser, currentUser) : false
 	};
 	return user;
 };
