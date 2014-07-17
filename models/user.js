@@ -5,9 +5,8 @@ var userSchema = new mongoose.Schema({
   email:     						 String,
   name:      	  				 String,
   password:   					 String,
-  avatar: 							 String, // Uploading photo 
-  followedByCurrentUser: {type: Boolean, default: false},
-  followings:  					 [{type: String}],
+  avatar: 							 String, // Uploading photo   
+  followees:  					 [{type: String}],
   followers:  					 [{type: String}]
 });
 

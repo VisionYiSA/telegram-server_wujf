@@ -19,15 +19,15 @@ exports.follow = function(req, res, next){
 				if(user) { 
 		      // console.log('saved : '+user);
 		      // console.log("==== Store loggedIn user to following user's followers ====")
-		      User.findOne({'username': newFollowingUser}, function(err, followingUser){
-		      	// console.log("followingUser : " + followingUser);
-		      	if(followingUser){
-		      		followingUser.followers.push(loggedInUser);
-		      		followingUser.save(function(err, aUser){
+		      User.findOne({'username': newFollowingUser}, function(err, followee){
+		      	// console.log("followee : " + followee);
+		      	if(followee){
+		      		followee.followers.push(loggedInUser);
+		      		followee.save(function(err, aUser){
 		      			// console.log("Saved : " + aUser);
 		      			return res.send(200);
 		      		});
-		      		// console.log("Saved followingUser : " + followingUser);
+		      		// console.log("Saved followee : " + followee);
 		      	} else {
 		      		return res.send(400);
 		      	}
@@ -57,18 +57,18 @@ exports.unfollow = function(req, res, next){
 					if(user) { 
 			      // console.log('saved : '+user);
 			      // console.log("==== Remove loggedIn user from userToUnfollow's followers ====")
-			      User.findOne({'username': userToUnfollow}, function(err, followingUser){
-			      	// console.log("followingUser : " + followingUser);
-			      	if(followingUser){
-			      		var index = followingUser.followers.indexOf(userToUnfollow);
+			      User.findOne({'username': userToUnfollow}, function(err, followee){
+			      	// console.log("followee : " + followee);
+			      	if(followee){
+			      		var index = followee.followers.indexOf(userToUnfollow);
 			      		if(index > -1){
-			      			followingUser.followers.splice(index, 1);
-				      		followingUser.save(function(err, aUser){
+			      			followee.followers.splice(index, 1);
+				      		followee.save(function(err, aUser){
 				      			// console.log("Saved : " + aUser);
 				      			return res.send(200);
 				      		});
 			      		}
-			      		// console.log("Saved followingUser : " + followingUser);
+			      		// console.log("Saved followee : " + followee);
 			      	} else {
 			      		return res.send(400);
 			      	}
