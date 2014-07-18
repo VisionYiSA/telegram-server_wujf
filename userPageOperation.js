@@ -7,26 +7,29 @@ var async = require("async"),
 exports.follow = function(req, res){
 	var newFollowingUser = req.query.user,
 			loggedInUser 		 = req.user.username,
-			asyncTasks 			 = [];
+			asyncTasks 			 = [],
+			callback 				 = function(){console.log('DONE');};
 
-	var updateFollowees = function(){
+	var updateFollowees = function(callback){
 		var query  = {username: loggedInUser};
 		var update = {$addToSet: {followees: newFollowingUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
 			console.log('1 async ' + result);
 		});
+		callback();
 	};
 
-	var updateFollowers = function(){
+	var updateFollowers = function(callback){
 		var query  = {username: newFollowingUser};
 		var update = {$addToSet: {followers: loggedInUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
 			console.log('2 async ' + result);
 		});
+		callback();
 	};
 
-	asyncTasks.push(updateFollowees());
-	asyncTasks.push(updateFollowers());
+	asyncTasks.push(updateFollowees(callback));
+	asyncTasks.push(updateFollowers(callback));
 
 	async.parallel(asyncTasks, function(err, result){
 		if(err){
@@ -41,27 +44,30 @@ exports.follow = function(req, res){
 
 exports.unfollow = function(req, res, next){
 	var userToUnfollow = req.query.user,
-	    loggedInUser 	 = req.user.username.
-		  asyncTasks 		 = [];
+	    loggedInUser 	 = req.user.username,
+		  asyncTasks 		 = [],
+		  callback 			 = function(){console.log('DONE');};
 	
-	var updateFollowees = function(){
+	var updateFollowees = function(callback){
 		var query  = {username: loggedInUser};
 		var update = {$pull: {followees: userToUnfollow}};
 		User.findOneAndUpdate(query, update, function(err, result){
 			console.log('1 async ' + result);
 		});
+		callback();
 	};
 
-	var updateFollowers = function(){
+	var updateFollowers = function(callback){
 		var query  = {username: userToUnfollow};
 		var update = {$pull: {followers: loggedInUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
 			console.log('2 async ' + result);
 		});
+		callback();
 	};
 
-	asyncTasks.push(updateFollowees());
-	asyncTasks.push(updateFollowers());
+	asyncTasks.push(updateFollowees(callback));
+	asyncTasks.push(updateFollowers(callback));
 
 	async.parallel(asyncTasks, function(err, result){
 		if(err){
