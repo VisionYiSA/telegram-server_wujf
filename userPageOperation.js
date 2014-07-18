@@ -7,32 +7,19 @@ var async = require("async"),
 exports.follow = function(req, res, next){
 	var newFollowingUser = req.query.user;
 	var loggedInUser = req.user.username;
+	console.log('newFollowingUser : '+newFollowingUser);
+	console.log('loggedInUser : '+loggedInUser);
 
 	async.parallel([
 		function(){
-			// var addFollowees = function(newFollowingUser){
-			// 	console.log('this');
-			// 	console.log(this);
-			// 	if(this.indexOf(newFollowingUser) < 0) {
-			// 		this.push(newFollowingUser);
-			// 	};
-			// };
-
-			// User.findOneAndUpdate({'username': loggedInUser}, {'followees': addFollowees(newFollowingUser)}, function(err, follower){
-
-			// 	console.log(" == loggedInUser : " + follower);
-			// });
-			var query = {'username': loggedInUser};
-			var update = {'followees': 
-			  // How can I get returned user (follower)
-			  // from the query {'username': loggedInUser}?
-				function(follower){ // follower is undefined
-					if(follower && follower.followees.indexOf(newFollowingUser) < 0) {
-						follower.followees.push(newFollowingUser);
-					};
-					return follower.followees;
-				}
-			}
+			var query  = {username: loggedInUser};
+			var update = {$addToSet: {followees: newFollowingUser}}
+				// function(follower){ 
+				// 	if(follower && follower.followees.indexOf(newFollowingUser) < 0) {
+				// 		follower.followees.push(newFollowingUser);
+				// 	};
+				// 	return follower.followees;
+				// }
 			User.findOneAndUpdate(query, update);
 		},function(){
 			// var addFollowers = function(loggedInUser){
@@ -46,20 +33,27 @@ exports.follow = function(req, res, next){
 	  //   	console.log(" == newFollowingUser : " + followee);
 	  //   });
 
-	    User.findOne(
-	    	{'username': newFollowingUser}, 
-	    	function(err, followee){
-		    	if(followee && followee.followers.indexOf(loggedInUser) < 0){
-		    		followee.followers.push(loggedInUser);
-		    	};
-		    	console.log(" == newFollowingUser : " + followee);
-		    },
-		    {'followers': followee.followers}
-	    );
+	    // User.findOne(
+	    // 	{'username': newFollowingUser}, 
+	    // 	function(err, followee){
+		   //  	if(followee && followee.followers.indexOf(loggedInUser) < 0){
+		   //  		followee.followers.push(loggedInUser);
+		   //  	};
+		   //  	console.log(" == newFollowingUser : " + followee);
+		   //  },
+		   //  {'followers': followee.followers}
+	    // );
+
+			var query  = {username: newFollowingUser};
+			var update = {$addToSet: {followers: loggedInUser}}
+			User.findOneAndUpdate(query, update);
+
 		}], function(err, result){
 		if(err){
+			console.log("FAILED!");
 			return res.send(500);
 		} else {
+			console.log("OK!");
 			return res.send(200);
 		}
 	});

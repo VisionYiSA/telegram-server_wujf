@@ -20,7 +20,7 @@ var userPageOperation = require('./userPageOperation');
 mongoose.connect('mongodb://127.0.0.1/telegram', 
   function(err){
     if(err) return console.log(err);
-    console.log('***** Connected to MongoDB *****')
+    // console.log('***** Connected to MongoDB *****')
 });
 
 // =========== Config ===========
