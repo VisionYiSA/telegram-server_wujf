@@ -1,21 +1,22 @@
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
+var express = require('express'),
+    app = express(),
+    bodyParser = require('body-parser'),
+    cookieParser = require('cookie-parser'),
+    session = require('express-session'),
 
-var passport = require('passport');
-var ensureAuthenticated = require('./ensureAuthenticated');
+    passport = require('passport'),
+    ensureAuthenticated = require('./ensureAuthenticated'),
 
-var mongoose = require('mongoose');
-var MongoStore = require('connect-mongostore')(session);
+    mongoose = require('mongoose'),
+    MongoStore = require('connect-mongostore')(session),
 
-var User = require('./models/user');
-var Post = require('./models/post');
+    User = require('./models/user'),
+    Post = require('./models/post'),
 
-var userOperation = require('./userOperation');
-var postOperation = require('./postOperation');
-var userPageOperation = require('./userPageOperation');
+    userOperation = require('./userOperation'),
+    postOperation = require('./postOperation'),
+    userPageOperation = require('./userPageOperation'),
+    emberObjWrapper = require('./emberObjWrapper');
 
 mongoose.connect('mongodb://127.0.0.1/telegram', 
   function(err){
@@ -40,16 +41,8 @@ app.get('/api/checkLoggedIn', function(req, res){
   // console.log('req.user: ' + req.user);
   // console.log('Before req.user : isAuthenticated = ' + req.isAuthenticated());
   if (req.user){
-    // console.log('Inside if: ' + req.user);
-    var emberUser = {
-      'id': req.user.username,
-      'username': req.user.username,
-      'name' : req.user.name,
-      'email' : req.user.email
-    }
-    return res.send(200, {user: emberUser});
+    return res.send(200, {user: emberObjWrapper.emberUser(req.user)});
   } else {
-    // console.log(req);
     return res.send(200, {user: null});
   }
 });

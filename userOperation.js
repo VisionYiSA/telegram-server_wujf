@@ -23,8 +23,8 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
   var username      = req.query.username,
       password      = req.query.password,
       operation     = req.query.operation,
-      follower      = req.query.follower,
-      followee      = req.query.followee;
+      currentUserAsFollower      = req.query.follower,
+      currentUserAsFollowee      = req.query.followee;
 
   if(operation == 'login'){
     passport.authenticate('local', function(err, user, info) {
@@ -37,42 +37,38 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
     })(req, res, next);
 
   // ======= GET Followees (users that current URL user follows)=======
-  } else if(follower){
+  // Check if current URL user is in the array of followers of any users
+  } else if(currentUserAsFollower){
+    console.log(' ');
     var emberFollowees = [];
-    var currentUserid = follower;
-    console.log("follower = currentUserid = "+currentUserid);
-    User.find({'followers': currentUserid}, function(err, followees){
-      console.log("followees : "+followees);
+    console.log("currentUser As Follower: "+currentUserAsFollower);
+    User.find({'followers': currentUserAsFollower}, function(err, followees){
+      console.log(currentUserAsFollower+"'s followees : " + followees);
       if(followees){
         followees.forEach(
-          // Search in array of followers or followees for eachUser 
-          // for currentUserid => followingCurrentUser or followedByCurrentUser
           function(user){
-            emberFollowees.push(emberObjWrapper.emberUser(user, currentUserid));
+            emberFollowees.push(emberObjWrapper.emberUser(user, currentUserAsFollower));
           }
         )
         return res.send(200, {users: emberFollowees});
-      } else {
-        return res.send(404);
       };
     });
   }
-  // ======= GET Followers (users that follows current URL user)=============
-  else if(followee){
+  // ======= GET Followers (users that follows current URL user)=======
+  // Check if current URL user is in the array of followees of any users
+  else if(currentUserAsFollowee){
+    console.log(' ');
     var emberFollowers = [];
-    var currentUserid = followee;
-    console.log("followee = currentUserid = "+currentUserid);
-    User.find({'followees': currentUserid}, function(err, followers){
-      console.log("followers : "+followers);
+    console.log("currentUser As Followee: "+currentUserAsFollowee);
+    User.find({'followees': currentUserAsFollowee}, function(err, followers){
+      console.log(currentUserAsFollowee + "'s followers : "+followers);
       if(followers){
         followers.forEach(
           function(user){
-            emberFollowers.push(emberObjWrapper.emberUser(user, currentUserid));
+            emberFollowers.push(emberObjWrapper.emberUser(user, currentUserAsFollowee));
           }
         )
         return res.send(200, {users: emberFollowers});
-      } else {
-        return res.send(404);
       };
     });
   }
