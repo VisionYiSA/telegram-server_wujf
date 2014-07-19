@@ -4,11 +4,15 @@ var User = require('./models/user');
 var emberObjWrapper = require('./emberObjWrapper');
 
 exports.register = function(req, res){
+  var randomNum = Math.floor(5*Math.random());
+  var avatar = 'images/avatar-'+randomNum+'.png';
+
   var newUser = new User({
     username: req.body.user.username,
     name: req.body.user.name,
     eamil: req.body.user.email,
-    password: req.body.user.password
+    password: req.body.user.password,
+    avatar: avatar
   });
 
   newUser.save(function(err, user){

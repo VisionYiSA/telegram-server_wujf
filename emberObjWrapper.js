@@ -32,6 +32,7 @@ exports.emberUser = function(mongoUser, currentUser){
 		'username': mongoUser.username,
 		'name': 		mongoUser.name,
 		'email': 		mongoUser.email,
+		'avatar': 	mongoUser.avatar,
 		'followedByCurrentUser': currentUser ? isCurrentUserFollowing(mongoUser, currentUser): false,
 		'followingCurrentUser':  currentUser ? isCurrentUserFollowed(mongoUser, currentUser) : false
 	};
