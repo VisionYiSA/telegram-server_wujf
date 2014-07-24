@@ -16,7 +16,7 @@ var isCurrentUserFollowing = function(mongoUser, currentUser){
 // (Check if current user is followed by mongoUser)
 var isCurrentUserFollowed = function(mongoUser, currentUser){
 	console.log(' ');
-	console.log('=== is '+currentUser+' Following '+mongoUser.username+' ? ===');
+	console.log('=== is '+mongoUser.username+' Following '+currentUser+' ? ===');
 	if(mongoUser.followees.indexOf(currentUser) >= 0){
 		console.log('TRUE!');
 		return true;

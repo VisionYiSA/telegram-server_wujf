@@ -45,13 +45,14 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
   } else if(currentUserAsFollower){
     console.log(' ');
     var emberFollowees = [];
-    console.log("currentUser As Follower: "+currentUserAsFollower);
+    var authenticatedUser = req.user.username;
+    // console.log("currentUser As Follower: "+currentUserAsFollower);
     User.find({'followers': currentUserAsFollower}, function(err, followees){
       console.log(currentUserAsFollower+"'s followees : " + followees);
       if(followees){
         followees.forEach(
           function(user){
-            emberFollowees.push(emberObjWrapper.emberUser(user, currentUserAsFollower));
+            emberFollowees.push(emberObjWrapper.emberUser(user, authenticatedUser));
           }
         )
         return res.send(200, {users: emberFollowees});
@@ -63,13 +64,14 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
   else if(currentUserAsFollowee){
     console.log(' ');
     var emberFollowers = [];
-    console.log("currentUser As Followee: "+currentUserAsFollowee);
+    var authenticatedUser = req.user.username;
+    // console.log("currentUser As Followee: "+currentUserAsFollowee);
     User.find({'followees': currentUserAsFollowee}, function(err, followers){
       console.log(currentUserAsFollowee + "'s followers : "+followers);
       if(followers){
         followers.forEach(
           function(user){
-            emberFollowers.push(emberObjWrapper.emberUser(user, currentUserAsFollowee));
+            emberFollowers.push(emberObjWrapper.emberUser(user, authenticatedUser));
           }
         )
         return res.send(200, {users: emberFollowers});
@@ -79,10 +81,15 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
 };
 
 exports.getUser = function(req, res){
+  console.log(' ');
+  console.log('===== getUser ======');
+  var authenticatedUser = req.user.username;
+  console.log('authenticatedUser = '+ authenticatedUser);
   var userId = req.params.user_id;
+  console.log('userId = '+userId);
   User.findOne({'username': userId}, function(err, user){
     if(user != null) { 
-      return res.send(200, {user: emberObjWrapper.emberUser(user)});
+      return res.send(200, {user: emberObjWrapper.emberUser(user, authenticatedUser)});
     } else {
       console.log('====== NOP =======');
       return res.send(404);
