@@ -1,7 +1,17 @@
 var passport = require('passport');
-require('./passport')(passport);
-var User = require('./models/user');
-var emberObjWrapper = require('./emberObjWrapper');
+require('../authentications/passport')(passport);
+var User = require('../models/user');
+var emberObjWrapper = require('../wrappers/emberObjWrapper');
+
+exports.checkLoggedInUserExistance = function(req, res){
+  // console.log('req.user: ' + req.user);
+  // console.log('Before req.user : isAuthenticated = ' + req.isAuthenticated());
+  if (req.user){
+    return res.send(200, {user: emberObjWrapper.emberUser(req.user)});
+  } else {
+    return res.send(200, {user: null});
+  }
+};
 
 exports.register = function(req, res){
   var randomNum = Math.floor(5*Math.random());

@@ -1,5 +1,5 @@
-var Post = require('./models/post');
-var emberObjWrapper = require('./emberObjWrapper');
+var Post = require('../models/post');
+var emberObjWrapper = require('../wrappers/emberObjWrapper');
 
 exports.getPosts = function(req, res){
   var userId = req.query.user;

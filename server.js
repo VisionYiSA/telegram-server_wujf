@@ -5,7 +5,7 @@ var express = require('express'),
     session = require('express-session'),
 
     passport = require('passport'),
-    ensureAuthenticated = require('./ensureAuthenticated'),
+    ensureAuthenticated = require('./authentications/ensureAuthenticated'),
 
     mongoose = require('mongoose'),
     MongoStore = require('connect-mongostore')(session),
@@ -13,10 +13,10 @@ var express = require('express'),
     User = require('./models/user'),
     Post = require('./models/post'),
 
-    userOperation = require('./userOperation'),
-    postOperation = require('./postOperation'),
-    userPageOperation = require('./userPageOperation'),
-    emberObjWrapper = require('./emberObjWrapper');
+    userOperation = require('./operations/userOperation'),
+    postOperation = require('./operations/postOperation'),
+    userPageOperation = require('./operations/userPageOperation'),
+    emberObjWrapper = require('./wrappers/emberObjWrapper');
 
 mongoose.connect('mongodb://127.0.0.1/telegram', 
   function(err){
@@ -37,15 +37,7 @@ app.use(passport.session());
 
 
 // ==== beforeModel Check if authenticated user exists ====
-app.get('/api/checkLoggedIn', function(req, res){
-  // console.log('req.user: ' + req.user);
-  // console.log('Before req.user : isAuthenticated = ' + req.isAuthenticated());
-  if (req.user){
-    return res.send(200, {user: emberObjWrapper.emberUser(req.user)});
-  } else {
-    return res.send(200, {user: null});
-  }
-});
+app.get('/api/checkLoggedIn', userOperation.checkLoggedInUserExistance);
 
 // =========== Routes ============
 app.get('/', function(req, res){res.send('Register');});

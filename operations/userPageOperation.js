@@ -1,8 +1,8 @@
 var passport = require('passport');
-require('./passport')(passport);
+require('../authentications/passport')(passport);
 var async = require("async"),
-		User = require('./models/user'),
-		Post = require('./models/post');
+		User = require('../models/user'),
+		Post = require('../models/post');
 
 exports.follow = function(req, res){
 	console.log('===== F O L L O W ===== ');
