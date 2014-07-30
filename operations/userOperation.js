@@ -1,4 +1,5 @@
-var passport = require('passport');
+var passport = require('passport'),
+    bcrypt = require('bcrypt');
 require('../authentications/passport')(passport);
 var User = require('../models/user');
 var emberObjWrapper = require('../wrappers/emberObjWrapper');
@@ -13,15 +14,29 @@ exports.checkLoggedInUserExistance = function(req, res){
   }
 };
 
+function encryptPassword(password){
+  // console.log(" ");
+  // console.log(" ======= BEFORE HASHED PASS ========");
+  // console.log(password);
+  bcrypt.genSalt(10, function(err, salt) {
+    bcrypt.hash(password, salt, function(err, hash) {
+      // console.log(" ");
+      // console.log(" ======= HASHED PASS ========");
+      // console.log(hash);
+      return hash;
+    });
+  });
+}
 exports.register = function(req, res){
   var randomNum = Math.floor(5*Math.random());
   var avatar = 'images/avatar-'+randomNum+'.png';
+
 
   var newUser = new User({
     username: req.body.user.username,
     name: req.body.user.name,
     eamil: req.body.user.email,
-    password: req.body.user.password,
+    password: encryptPassword(req.body.user.password),
     avatar: avatar
   });
 
@@ -91,12 +106,12 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
 };
 
 exports.getUser = function(req, res){
-  console.log(' ');
-  console.log('===== getUser ======');
+  // console.log(' ');
+  // console.log('===== getUser ======');
   var authenticatedUser = req.user.username;
-  console.log('authenticatedUser = '+ authenticatedUser);
+  // console.log('authenticatedUser = '+ authenticatedUser);
   var userId = req.params.user_id;
-  console.log('userId = '+userId);
+  // console.log('userId = '+userId);
   User.findOne({'username': userId}, function(err, user){
     if(user != null) { 
       return res.send(200, {user: emberObjWrapper.emberUser(user, authenticatedUser)});

@@ -18,6 +18,7 @@ exports.getPosts = function(req, res){
   } else {
     Post.find({}).sort({date:-1}).limit(20).exec(function(err, posts){
       if(posts != null) {
+        // console.log(posts);
         posts.forEach(
           function(post){
             emberUserPosts.push(emberObjWrapper.emberPost(post));

@@ -62,3 +62,6 @@ Keys: ember styled object? Array/Object?
 **Follow others**: gists - [https://gist.github.com/yhagio/605e5baace6854b1ec68](https://gist.github.com/yhagio/605e5baace6854b1ec68)
 * Follow function
 * At URL `users/:username/followings` Returns the following users of the user(:username), similar for `/followers`
+
+**Step-7 - SecurePass**
+* Encrypt / Decrypt password on Register & Login using jQuery MD5 on front, bcrypt on back-end.

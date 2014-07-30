@@ -11,6 +11,7 @@
     "cookie-parser": "~1.1.0",
     "express-session": "~1.2.1",
     "mongoose": "~3.8.12",
-    "connect-mongostore": "~0.1.0"
+    "connect-mongostore": "~0.1.0",
+    "bcrypt": "~0.7.8"
   }
 }
