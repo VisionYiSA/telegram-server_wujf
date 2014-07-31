@@ -14,36 +14,34 @@ exports.checkLoggedInUserExistance = function(req, res){
   }
 };
 
-function encryptPassword(password){
-  // console.log(" ");
-  // console.log(" ======= BEFORE HASHED PASS ========");
-  // console.log(password);
-  bcrypt.genSalt(10, function(err, salt) {
-    bcrypt.hash(password, salt, function(err, hash) {
-      // console.log(" ");
-      // console.log(" ======= HASHED PASS ========");
-      // console.log(hash);
-      return hash;
-    });
-  });
-}
+
 exports.register = function(req, res){
   var randomNum = Math.floor(5*Math.random());
   var avatar = 'images/avatar-'+randomNum+'.png';
+  var hasedPassword;
 
+  bcrypt.genSalt(10, function(err, salt) {
+    bcrypt.hash(req.body.user.password, salt, function(err, hash) {
+      // console.log(" ");
+      // console.log(" ======= HASHED PASS ========");
+      // console.log(hash);
+      hasedPassword = hash;
+      // callback();
+      var newUser = new User({
+        username: req.body.user.username,
+        name: req.body.user.name,
+        eamil: req.body.user.email,
+        password: hasedPassword,
+        avatar: avatar
+      });
+      // console.log(newUser);
 
-  var newUser = new User({
-    username: req.body.user.username,
-    name: req.body.user.name,
-    eamil: req.body.user.email,
-    password: encryptPassword(req.body.user.password),
-    avatar: avatar
-  });
-
-  newUser.save(function(err, user){
-    req.login(user, function(err) { // Set cookie here 
-      if (err) { return res.send(400); }  
-      return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
+      newUser.save(function(err, user){
+        req.login(user, function(err) { // Set cookie here 
+          if (err) { return res.send(400); }  
+          return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
+        });
+      });
     });
   });
 };
@@ -56,11 +54,28 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
       currentUserAsFollowee      = req.query.followee;
 
   if(operation == 'login'){
+    console.log(' ======= login =====');
+
+    // function checkPasswordOnLogin(dbPassword, inputPassword){
+    //   console.log(' ');
+    //   console.log(" !!!!!! CHECK PASS !!!!!");
+    //   console.log(dbPassword);
+    //   console.log(inputPassword);
+    //   bcrypt.compare(inputPassword, dbPassword, function(err, res) {
+    //     console.log(res);
+    //     return res;
+    //   });
+    // }
+    // checkPasswordOnLogin();
+
     passport.authenticate('local', function(err, user, info) {
       if (err) { return res.send(400); }
       if (!user) { return res.send(400); }
+      console.log(user);
       req.login(user, function(err) { // Set cookie here 
         if (err) { return res.send(400); }
+        console.log(' ====== req.login passed =======');
+        console.log(user);
         return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
       });
     })(req, res, next);

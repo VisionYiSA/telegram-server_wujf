@@ -16,17 +16,6 @@ module.exports = function(passport) {
     });
   });
 
-  function checkPasswordOnLogin(dbPassword, inputPassword){
-    // console.log(' ');
-    // console.log(" !!!!!! CHECK PASS !!!!!");
-    // console.log(dbPassword);
-    // console.log(inputPassword);
-    bcrypt.compare(inputPassword, dbPassword, function(err, res) {
-      // console.log(res);
-      return res;
-    });
-  }
-
   passport.use('local', new LocalStrategy({
       usernameField: 'username'
     },
@@ -34,10 +23,21 @@ module.exports = function(passport) {
       User.findOne({
         'username': username
       }, function(err, user){
+        console.log(' ====== before bcrypt.compare ======');
         if(err){ return done(err); }
         if(!user){ return done(null, false); }
-        if(checkPasswordOnLogin(user.password, password)){ return done(null, false); }
-        return done(null, user);
+        // console.log('Password: ' + password);
+        // console.log('User.password: ' + user.password);
+        bcrypt.compare(password, user.password, function(err, res) {
+          // console.log('Password - 2: ' + password);
+          // console.log('User.password - 2: ' + user.password);
+          if(res) {
+            console.log(res);
+            return done(null, user);
+          } else {
+            return done(null, false);
+          }
+        });
       });
     }
   ));
