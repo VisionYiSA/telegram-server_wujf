@@ -32,9 +32,10 @@ module.exports = function(passport) {
           // console.log('Password - 2: ' + password);
           // console.log('User.password - 2: ' + user.password);
           if(res) {
-            console.log(res);
+            // console.log(res);
             return done(null, user);
           } else {
+            // console.log('ERROR')
             return done(null, false);
           }
         });

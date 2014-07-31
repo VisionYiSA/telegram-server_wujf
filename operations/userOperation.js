@@ -56,18 +56,6 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
   if(operation == 'login'){
     console.log(' ======= login =====');
 
-    // function checkPasswordOnLogin(dbPassword, inputPassword){
-    //   console.log(' ');
-    //   console.log(" !!!!!! CHECK PASS !!!!!");
-    //   console.log(dbPassword);
-    //   console.log(inputPassword);
-    //   bcrypt.compare(inputPassword, dbPassword, function(err, res) {
-    //     console.log(res);
-    //     return res;
-    //   });
-    // }
-    // checkPasswordOnLogin();
-
     passport.authenticate('local', function(err, user, info) {
       if (err) { return res.send(400); }
       if (!user) { return res.send(400); }
