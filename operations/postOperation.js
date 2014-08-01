@@ -19,6 +19,7 @@ exports.getPosts = function(req, res){
       return res.send(200, {posts: emberUserPosts}); 
     });
   } else if(!userId && authenticatedUser){ // For authenticated user to see posts from followees
+    console.log(" ========== !userId && authenticatedUser =========== ");
     Post.find({'user': {$in: authenticatedUser.followees}}).sort({date:-1}).limit(20).exec(function(err, posts){
       if(posts != null) {
         posts.forEach(
@@ -29,17 +30,8 @@ exports.getPosts = function(req, res){
       }
       return res.send(200, {posts: emberUserPosts}); 
     });
-  } else { // For non-logged in users to see posts from all users
-    Post.find({}).sort({date:-1}).limit(20).exec(function(err, posts){
-      if(posts != null) {
-        posts.forEach(
-          function(post){
-            emberUserPosts.push(emberObjWrapper.emberPost(post));
-          }
-        )
-      }
-      return res.send(200, {posts: emberUserPosts}); 
-    });  
+  } else {
+    return res.send(404);
   }
 };
  
