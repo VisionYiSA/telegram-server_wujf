@@ -17,6 +17,7 @@ var express = require('express'),
     postOperation = require('./operations/postOperation'),
     userPageOperation = require('./operations/userPageOperation'),
     emberObjWrapper = require('./wrappers/emberObjWrapper');
+    // email = require('./email/resetPassword');
 
 mongoose.connect('mongodb://127.0.0.1/telegram', 
   function(err){
@@ -47,8 +48,6 @@ app.get('/api/users', userOperation.loginOrGetFolloweesOrFollowers);
 app.get('/api/users/:user_id', userOperation.getUser);
 app.get('/api/logout', userOperation.logout);
 
-app.get('/api/resetpassword',  function(req, res){});
-app.post('/api/resetpassword', function(req, res){});
 app.get('/api/sentpassnotify', function(req, res){});
 
 app.get('/api/posts', postOperation.getPosts);

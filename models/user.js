@@ -7,7 +7,8 @@ var userSchema = new mongoose.Schema({
   password:   					 String,
   avatar: 							 String, // Uploading photo   
   followees:  					 [{type: String}],
-  followers:  					 [{type: String}]
+  followers:  					 [{type: String}],
+  date: {type: Date, default: Date.now}
 });
 
 module.exports = mongoose.model('User', userSchema);

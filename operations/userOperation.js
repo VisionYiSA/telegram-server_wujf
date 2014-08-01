@@ -47,23 +47,25 @@ exports.register = function(req, res){
 };
 
 exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
+  // console.log(req);
   var username      = req.query.username,
       password      = req.query.password,
+      email         = req.query.email,
       operation     = req.query.operation,
       currentUserAsFollower      = req.query.follower,
       currentUserAsFollowee      = req.query.followee;
 
   if(operation == 'login'){
-    console.log(' ======= login =====');
+    // console.log(' ======= login =====');
 
     passport.authenticate('local', function(err, user, info) {
       if (err) { return res.send(400); }
       if (!user) { return res.send(400); }
-      console.log(user);
+      // console.log(user);
       req.login(user, function(err) { // Set cookie here 
         if (err) { return res.send(400); }
-        console.log(' ====== req.login passed =======');
-        console.log(user);
+        // console.log(' ====== req.login passed =======');
+        // console.log(user);
         return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
       });
     })(req, res, next);
@@ -71,12 +73,12 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
   // ======= GET Followees (users that current URL user follows)=======
   // Check if current URL user is in the array of followers of any users
   } else if(currentUserAsFollower){
-    console.log(' ');
+    // console.log(' ');
     var emberFollowees = [];
     var authenticatedUser = req.user.username;
     // console.log("currentUser As Follower: "+currentUserAsFollower);
-    User.find({'followers': currentUserAsFollower}, function(err, followees){
-      console.log(currentUserAsFollower+"'s followees : " + followees);
+    User.find({'followers': currentUserAsFollower}).sort({date:-1}).limit(20).exec(function(err, followees){
+      // console.log(currentUserAsFollower+"'s followees : " + followees);
       if(followees){
         followees.forEach(
           function(user){
@@ -94,7 +96,7 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
     var emberFollowers = [];
     var authenticatedUser = req.user.username;
     // console.log("currentUser As Followee: "+currentUserAsFollowee);
-    User.find({'followees': currentUserAsFollowee}, function(err, followers){
+    User.find({'followees': currentUserAsFollowee}).sort({date:-1}).limit(20).exec(function(err, followers){
       console.log(currentUserAsFollowee + "'s followers : "+followers);
       if(followers){
         followers.forEach(
@@ -105,24 +107,60 @@ exports.loginOrGetFolloweesOrFollowers = function(req, res, next){
         return res.send(200, {users: emberFollowers});
       };
     });
+  } else if(operation == 'resetPassword'){
+    console.log("username = "+username);
+    console.log("email = "+email);
+    User.find({'username': username}, function(err, user){
+      if(email == user.email) { 
+        console.log(' ======== SENDING EMAIL ======= ');
+
+        // ====== Send Email ======
+        var dotenv = require('dotenv');
+        dotenv.load();
+        var Mailgun = require('mailgun-js');
+
+        var mailgun = new Mailgun({
+           apiKey: process.env.API_KEY, 
+           domain: process.env.DOMAIN});
+
+        var data = {
+          from: 'Telegram Admin <postmaster@'+process.env.DOMAIN+'>',
+          to: email,
+          subject: '[Telegram Admin] - Password Reset',
+          html: '../email/resetPassMsg.hbs'
+        };
+
+        mailgun.messages().send(data, function (error, body) {
+          console.log(body);
+        });
+
+        return res.send(200);
+      } else {
+        console.log('====== User Not Found =======');
+        return res.send(404);
+      }
+    });
   }
 };
 
 exports.getUser = function(req, res){
   // console.log(' ');
   // console.log('===== getUser ======');
-  var authenticatedUser = req.user.username;
-  // console.log('authenticatedUser = '+ authenticatedUser);
-  var userId = req.params.user_id;
-  // console.log('userId = '+userId);
-  User.findOne({'username': userId}, function(err, user){
-    if(user != null) { 
-      return res.send(200, {user: emberObjWrapper.emberUser(user, authenticatedUser)});
-    } else {
-      console.log('====== NOP =======');
-      return res.send(404);
-    }
-  });
+  var authenticatedUser = req.user.username
+      userId            = req.params.user_id;
+
+  if(authenticatedUser && userId){
+    User.findOne({'username': userId}, function(err, user){
+      if(user != null) { 
+        return res.send(200, {user: emberObjWrapper.emberUser(user, authenticatedUser)});
+      } else {
+        console.log('====== NOP =======');
+        return res.send(404);
+      }
+    });
+  } else {
+    return res.send(404);
+  }
 };
 
 exports.logout = function(req, res){
