@@ -14,8 +14,8 @@ exports.follow = function(req, res){
 		var query  = {username: loggedInUser};
 		var update = {$addToSet: {followees: newFollowingUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			console.log('===== updateFollowees ===== ');
-			console.log(result.username + "'s followees: " + result.followees);
+			// console.log('===== updateFollowees ===== ');
+			// console.log(result.username + "'s followees: " + result.followees);
 		});
 		callback();
 	}
@@ -24,8 +24,8 @@ exports.follow = function(req, res){
 		var query  = {username: newFollowingUser};
 		var update = {$addToSet: {followers: loggedInUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			console.log('==== updateFollowers =====');
-			console.log(result.username + "'s followers: " + result.followers);
+			// console.log('==== updateFollowers =====');
+			// console.log(result.username + "'s followers: " + result.followers);
 		});
 		callback();
 	}
@@ -45,7 +45,7 @@ exports.follow = function(req, res){
 };
 
 exports.unfollow = function(req, res, next){
-	console.log('===== U N F O L L O W ===== ');
+	// console.log('===== U N F O L L O W ===== ');
 	var userToUnfollow = req.query.user,
 	    loggedInUser 	 = req.user.username,
 		  asyncTasks 		 = [];
@@ -54,8 +54,8 @@ exports.unfollow = function(req, res, next){
 		var query  = {username: loggedInUser};
 		var update = {$pull: {followees: userToUnfollow}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			console.log('===== updateFollowees ===== ');
-			console.log(result.username + "'s followees: " + result.followees);
+			// console.log('===== updateFollowees ===== ');
+			// console.log(result.username + "'s followees: " + result.followees);
 		});
 		callback();
 	}
@@ -64,8 +64,8 @@ exports.unfollow = function(req, res, next){
 		var query  = {username: userToUnfollow};
 		var update = {$pull: {followers: loggedInUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			console.log('==== updateFollowers =====');
-			console.log(result.username + "'s followers: " + result.followers);
+			// console.log('==== updateFollowers =====');
+			// console.log(result.username + "'s followers: " + result.followers);
 		});
 		callback();
 	}
@@ -75,10 +75,10 @@ exports.unfollow = function(req, res, next){
 
 	async.parallel(asyncTasks, function(err, result){
 		if(err){
-			console.log("FAILED!");
+			// console.log("FAILED!");
 			return res.send(500);
 		} else {
-			console.log("NO ERROR ON UNFOLLOW");
+			// console.log("NO ERROR ON UNFOLLOW");
 			return res.send(200);
 		}
 	});

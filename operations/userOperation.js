@@ -2,9 +2,10 @@ var passport = require('passport'),
     bcrypt = require('bcrypt'),
     config = require('../config');
 require('../authentications/passport')(passport);
-var User = require('../models/user');
-var emberObjWrapper = require('../wrappers/emberObjWrapper');
-var resetPass = require('../resetPass/sendNewPass');
+
+var User = require('../models/user'),
+    emberObjWrapper = require('../wrappers/emberObjWrapper'),
+    resetPass = require('../resetPass/sendNewPass');
 
 exports.checkLoggedInUserExistance = function(req, res){
   // console.log('req.user: ' + req.user);
@@ -17,19 +18,19 @@ exports.checkLoggedInUserExistance = function(req, res){
 };
 
 exports.register = function(req, res){
-  var randomNum = Math.floor(5*Math.random());
-  var avatar = 'images/avatar-'+randomNum+'.png';
-  var hasedPassword;
+  var randomNum = Math.floor(5*Math.random()),
+      avatar = 'images/avatar-'+randomNum+'.png',
+      hasedPassword;
 
   bcrypt.genSalt(10, function(err, salt) {
     bcrypt.hash(req.body.user.password, salt, function(err, hash) {
       hasedPassword = hash;
       var newUser = new User({
         username: req.body.user.username,
-        name: req.body.user.name,
-        email: req.body.user.email,
+        name:     req.body.user.name,
+        email:    req.body.user.email,
         password: hasedPassword,
-        avatar: avatar
+        avatar:   avatar
       });
 
       newUser.save(function(err, user){
@@ -83,12 +84,10 @@ exports.userQueryHandlers = function(req, res, next){
         return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
       });
     })(req, res, next);
-  } else if(currentUserAsFollower){
-    // ======= GET Followees (users that current URL user follows)=======
+  } else if(currentUserAsFollower){ //GET Followees of current URL user
     getFollowees(currentUserAsFollower, req.user.username);
   }
-  else if(currentUserAsFollowee){
-    // ======= GET Followers (users that follows current URL user)=======
+  else if(currentUserAsFollowee){ //GET Followers of current URL user
     getFollowers(currentUserAsFollowee, req.user.username);
   } else if(operation == 'resetPassword' && username && email){
     resetPass.sendNewPass(req, res, username, email);
@@ -96,7 +95,6 @@ exports.userQueryHandlers = function(req, res, next){
 };
 
 exports.getUser = function(req, res){
-
   function getTheUser(user_id, authenticatedUser){
     User.findOne({'username': userId}, function(err, user){
       if(user != null) { 

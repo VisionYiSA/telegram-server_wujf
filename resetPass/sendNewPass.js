@@ -1,7 +1,7 @@
 var bcrypt = require('bcrypt'),
-    config = require('../config');
-var User = require('../models/user');
-var emberObjWrapper = require('../wrappers/emberObjWrapper');
+    config = require('../config'),
+    User   = require('../models/user'),
+    emberObjWrapper = require('../wrappers/emberObjWrapper');
 
 function emailTemplate(username, password){
   var htmlMsg = 
@@ -29,42 +29,39 @@ function newPassword(){
 }
 
 exports.sendNewPass = function(req, res, username, email){
-    User.findOne({'username': username}, function(err, user){
-      if(user && email == user.email) { 
-        // ====== Send Email ======
-        var Mailgun = require('mailgun-js');
-        var mailgun = new Mailgun({
-          apiKey: config.API_KEY, 
-          domain: config.DOMAIN
-        });
-        var newPass = newPassword();
+  User.findOne({'username': username}, function(err, user){
+    if(user && email == user.email) { 
+      var Mailgun = require('mailgun-js');
+      var mailgun = new Mailgun({
+        apiKey: config.API_KEY, 
+        domain: config.DOMAIN
+      });
+      var newPass = newPassword();
+      var data = {
+        from: 'Telegram Admin <postmaster@'+config.DOMAIN+'>',
+        to: email,
+        subject: '[Telegram Admin] - Password Reset',
+        html: emailTemplate(username, newPass)
+      };
 
-        var data = {
-          from: 'Telegram Admin <postmaster@'+config.DOMAIN+'>',
-          to: email,
-          subject: '[Telegram Admin] - Password Reset',
-          html: emailTemplate(username, newPass)
-        };
-
-        mailgun.messages().send(data, function (error, body) {
-          if(error){
-            console.log(error);
-            return res.send(500);
-          } else {
-            console.log(body);
-            bcrypt.genSalt(10, function(err, salt) {
-              bcrypt.hash(newPass, salt, function(err, hash) {
-                user.password = hash;
-                user.save();
-                console.log(user);
-                return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
-              });
+      mailgun.messages().send(data, function (error, body) {
+        if(error){
+          return res.send(500);
+        } else {
+          console.log(body);
+          bcrypt.genSalt(10, function(err, salt) {
+            bcrypt.hash(newPass, salt, function(err, hash) {
+              user.password = hash;
+              user.save();
+              // console.log(user);
+              return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
             });
-          }
-        });
-      } else {
-        console.log('====== User Not Found =======');
-        return res.send(404);
-      }
-    });
+          });
+        }
+      });
+    } else {
+      console.log('====== User Not Found =======');
+      return res.send(404);
+    }
+  });
 };
