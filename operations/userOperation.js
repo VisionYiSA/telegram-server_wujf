@@ -5,6 +5,30 @@ require('../authentications/passport')(passport);
 var User = require('../models/user');
 var emberObjWrapper = require('../wrappers/emberObjWrapper');
 
+function emailTemplate(password){
+  var htmlMsg = 
+  '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'+
+  '<html xmlns="http://www.w3.org/1999/xhtml">'+
+    '<body>'+
+       '<p>Hey there,</p>'+
+       '<p>Your new password is' + password +'</p>'+
+       '<br/>'+
+      '<p>All the best,</p>'+
+      '<p>The Telegram App Team</p>'+
+    '</body>'+
+  '</html>';
+  return htmlMsg;
+}
+
+function newPassword(){
+  var newPass = "";
+  var letterNumMix = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for( var i=0; i < 10; i++ ){
+    newPass += letterNumMix.charAt(Math.floor(Math.random() * letterNumMix.length));
+  }
+  return newPass;
+}
+
 exports.checkLoggedInUserExistance = function(req, res){
   // console.log('req.user: ' + req.user);
   // console.log('Before req.user : isAuthenticated = ' + req.isAuthenticated());
@@ -103,14 +127,18 @@ exports.userQueryHandlers = function(req, res, next){
           from: 'Telegram Admin <postmaster@'+config.DOMAIN+'>',
           to: email,
           subject: '[Telegram Admin] - Password Reset',
-          text: 'Test Email'//'../email/resetPassMsg.hbs'
+          html: emailTemplate(newPassword())
         };
 
         mailgun.messages().send(data, function (error, body) {
-          console.log(body);
+          if(error){
+            console.log(error);
+            return res.send(500);
+          } else {
+            console.log(body);
+            return res.send(200);
+          }
         });
-
-        return res.send(200);
       } else {
         console.log('====== User Not Found =======');
         return res.send(404);

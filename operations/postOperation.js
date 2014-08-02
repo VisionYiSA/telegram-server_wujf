@@ -22,7 +22,6 @@ exports.getPosts = function(req, res){
     });
   } else if(!userId && authenticatedUser.username === followeesOf){ // For authenticated user to see posts from followees
     console.log(" ========== !userId && authenticatedUser =========== ");
-    console.log('YAY');
     Post.find(
       {$or: 
         [
