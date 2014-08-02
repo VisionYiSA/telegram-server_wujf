@@ -3,9 +3,11 @@ var Post = require('../models/post');
 var emberObjWrapper = require('../wrappers/emberObjWrapper');
 
 exports.getPosts = function(req, res){
+  var followeesOf = req.query.followeesOf;
   var authenticatedUser = req.user;
   var userId = req.query.user;
   var emberUserPosts = [];
+
   if(userId){
     // At UserRoute
     Post.find({'user': userId}).sort({date:-1}).limit(20).exec(function(err, posts){
@@ -18,9 +20,17 @@ exports.getPosts = function(req, res){
       }
       return res.send(200, {posts: emberUserPosts}); 
     });
-  } else if(!userId && authenticatedUser){ // For authenticated user to see posts from followees
+  } else if(!userId && authenticatedUser.username === followeesOf){ // For authenticated user to see posts from followees
     console.log(" ========== !userId && authenticatedUser =========== ");
-    Post.find({'user': {$in: authenticatedUser.followees}}).sort({date:-1}).limit(20).exec(function(err, posts){
+    console.log('YAY');
+    Post.find(
+      {$or: 
+        [
+          {'user': {$in: authenticatedUser.followees}},
+          {'user': authenticatedUser.username}
+        ]
+      }
+    ).sort({date:-1}).limit(20).exec(function(err, posts){
       if(posts != null) {
         posts.forEach(
           function(post){
