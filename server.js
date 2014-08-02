@@ -44,7 +44,7 @@ app.get('/api/checkLoggedIn', userOperation.checkLoggedInUserExistance);
 app.get('/', function(req, res){res.send('Register');});
 app.post('/api/users', userOperation.register);
 app.get('/api/login', function(req, res){res.send('Login');});
-app.get('/api/users', userOperation.loginOrGetFolloweesOrFollowers);
+app.get('/api/users', userOperation.userQueryHandlers);
 app.get('/api/users/:user_id', userOperation.getUser);
 app.get('/api/logout', userOperation.logout);
 

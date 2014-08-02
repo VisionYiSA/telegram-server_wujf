@@ -6,7 +6,7 @@ exports.getPosts = function(req, res){
   var authenticatedUser = req.user;
   var userId = req.query.user;
   var emberUserPosts = [];
-  if(userId && authenticatedUser){
+  if(userId){
     // At UserRoute
     Post.find({'user': userId}).sort({date:-1}).limit(20).exec(function(err, posts){
       if(posts != null) {
