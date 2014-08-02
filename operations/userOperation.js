@@ -11,7 +11,7 @@ function emailTemplate(password){
   '<html xmlns="http://www.w3.org/1999/xhtml">'+
     '<body>'+
        '<p>Hey there,</p>'+
-       '<p>Your new password is' + password +'</p>'+
+       '<p>Your new password is: <strong>' + password +'</strong></p>'+
        '<br/>'+
       '<p>All the best,</p>'+
       '<p>The Telegram App Team</p>'+
@@ -122,12 +122,13 @@ exports.userQueryHandlers = function(req, res, next){
           apiKey: config.API_KEY, 
           domain: config.DOMAIN
         });
+        var newPass = newPassword();
 
         var data = {
           from: 'Telegram Admin <postmaster@'+config.DOMAIN+'>',
           to: email,
           subject: '[Telegram Admin] - Password Reset',
-          html: emailTemplate(newPassword())
+          html: emailTemplate(newPass)
         };
 
         mailgun.messages().send(data, function (error, body) {
@@ -135,7 +136,13 @@ exports.userQueryHandlers = function(req, res, next){
             console.log(error);
             return res.send(500);
           } else {
-            console.log(body);
+            // console.log(body);
+            bcrypt.genSalt(10, function(err, salt) {
+              bcrypt.hash(newPass, salt, function(err, hash) {
+                user.password = hash;
+                user.save();
+              });
+            });
             return res.send(200);
           }
         });
@@ -166,7 +173,6 @@ exports.getUser = function(req, res){
   if(!req.user){
     if(req.params.user_id) {
       var userId = req.params.user_id;
-
       getTheUser(userId);
     } else {
       return res.send(404);
@@ -174,7 +180,6 @@ exports.getUser = function(req, res){
   } else {
     var authenticatedUser = req.user.username,
         userId            = req.params.user_id;
-
     if(authenticatedUser && userId){
       getTheUser(userId, authenticatedUser);
     } else {
