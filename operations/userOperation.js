@@ -4,30 +4,7 @@ var passport = require('passport'),
 require('../authentications/passport')(passport);
 var User = require('../models/user');
 var emberObjWrapper = require('../wrappers/emberObjWrapper');
-
-function emailTemplate(password){
-  var htmlMsg = 
-  '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'+
-  '<html xmlns="http://www.w3.org/1999/xhtml">'+
-    '<body>'+
-       '<p>Hey there,</p>'+
-       '<p>Your new password is: <strong>' + password +'</strong></p>'+
-       '<br/>'+
-      '<p>All the best,</p>'+
-      '<p>The Telegram App Team</p>'+
-    '</body>'+
-  '</html>';
-  return htmlMsg;
-}
-
-function newPassword(){
-  var newPass = "";
-  var letterNumMix = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for( var i=0; i < 10; i++ ){
-    newPass += letterNumMix.charAt(Math.floor(Math.random() * letterNumMix.length));
-  }
-  return newPass;
-}
+var resetPass = require('../resetPass/sendNewPass');
 
 exports.checkLoggedInUserExistance = function(req, res){
   // console.log('req.user: ' + req.user);
@@ -113,44 +90,8 @@ exports.userQueryHandlers = function(req, res, next){
   else if(currentUserAsFollowee){
     // ======= GET Followers (users that follows current URL user)=======
     getFollowers(currentUserAsFollowee, req.user.username);
-  } else if(operation == 'resetPassword'){
-    User.findOne({'username': username}, function(err, user){
-      if(email == user.email) { 
-        // ====== Send Email ======
-        var Mailgun = require('mailgun-js');
-        var mailgun = new Mailgun({
-          apiKey: config.API_KEY, 
-          domain: config.DOMAIN
-        });
-        var newPass = newPassword();
-
-        var data = {
-          from: 'Telegram Admin <postmaster@'+config.DOMAIN+'>',
-          to: email,
-          subject: '[Telegram Admin] - Password Reset',
-          html: emailTemplate(newPass)
-        };
-
-        mailgun.messages().send(data, function (error, body) {
-          if(error){
-            console.log(error);
-            return res.send(500);
-          } else {
-            // console.log(body);
-            bcrypt.genSalt(10, function(err, salt) {
-              bcrypt.hash(newPass, salt, function(err, hash) {
-                user.password = hash;
-                user.save();
-              });
-            });
-            return res.send(200);
-          }
-        });
-      } else {
-        console.log('====== User Not Found =======');
-        return res.send(404);
-      }
-    });
+  } else if(operation == 'resetPassword' && username && email){
+    resetPass.sendNewPass(req, res, username, email);
   }
 };
 
