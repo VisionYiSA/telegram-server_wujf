@@ -15,6 +15,7 @@
     "bcrypt": "~0.7.8",
     "emailjs": "~0.3.10",
     "handlebars": "~2.0.0-alpha.4",
-    "mailgun-js": "~0.5.4"
+    "mailgun-js": "~0.5.4",
+    "MD5": "~1.2.1"
   }
 }

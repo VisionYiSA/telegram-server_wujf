@@ -1,4 +1,5 @@
 var bcrypt = require('bcrypt'),
+    md5    = require('MD5'),
     config = require('../config'),
     User   = require('../models/user'),
     emberObjWrapper = require('../wrappers/emberObjWrapper');
@@ -49,8 +50,9 @@ exports.sendNewPass = function(req, res, username, email){
           return res.send(500);
         } else {
           console.log(body);
+          var newMD5Pass = md5(newPass);
           bcrypt.genSalt(10, function(err, salt) {
-            bcrypt.hash(newPass, salt, function(err, hash) {
+            bcrypt.hash(newMD5Pass, salt, function(err, hash) {
               user.password = hash;
               user.save();
               // console.log(user);
