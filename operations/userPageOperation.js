@@ -1,10 +1,12 @@
 var passport = require('passport');
 require('../authentications/passport')(passport);
+var conn = require('../dbconnection');
 var async = require("async"),
-		User = require('../models/user'),
-		Post = require('../models/post');
-
-exports.follow = function(req, res){
+		User = conn.model('User'),
+		Post = conn.model('User'),
+		userPageOperation = exports;
+		
+userPageOperation.follow = function(req, res){
 	console.log('===== F O L L O W ===== ');
 	var newFollowingUser = req.query.user,
 			loggedInUser 		 = req.user.username,
@@ -44,7 +46,7 @@ exports.follow = function(req, res){
 	});
 };
 
-exports.unfollow = function(req, res, next){
+userPageOperation.unfollow = function(req, res, next){
 	// console.log('===== U N F O L L O W ===== ');
 	var userToUnfollow = req.query.user,
 	    loggedInUser 	 = req.user.username,

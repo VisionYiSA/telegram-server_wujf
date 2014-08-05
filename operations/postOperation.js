@@ -1,8 +1,10 @@
-var User = require('../models/user');
-var Post = require('../models/post');
+var conn = require('../dbconnection');
+var User = conn.model('User');
+var Post = conn.model('Post');
 var emberObjWrapper = require('../wrappers/emberObjWrapper');
+var postOperation = exports;
 
-exports.getPosts = function(req, res){
+postOperation.getPosts = function(req, res){
   var followeesOf = req.query.followeesOf;
   var authenticatedUser = req.user;
   var userId = req.query.user;
@@ -44,7 +46,7 @@ exports.getPosts = function(req, res){
   }
 };
  
-exports.publishPost = function(req, res){
+postOperation.publishPost = function(req, res){
   if(req.user.username == req.body.post.user){
     var newPost = new Post({
       body: req.body.post.body,
@@ -61,7 +63,7 @@ exports.publishPost = function(req, res){
   }
 };
  
-exports.deletePost =  function(req, res){
+postOperation.deletePost =  function(req, res){
   var postToDelete = req.params.post_id;
   Post.findById(postToDelete, function(err, post){
     if(err) console.log(err);

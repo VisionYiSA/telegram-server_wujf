@@ -1,6 +1,6 @@
 // Check if the current user follows mongoUser
 // (Check if mongoUser is followed by current user)
-var isCurrentUserFollowing = function(mongoUser, currentUser){
+function isCurrentUserFollowing(mongoUser, currentUser){
 	console.log(' ');
 	console.log('=== is '+mongoUser.username+' Followed by '+currentUser+' ? ===');
 	if(mongoUser.followers.indexOf(currentUser) >= 0){
@@ -26,7 +26,9 @@ var isCurrentUserFollowed = function(mongoUser, currentUser){
 	}
 };
 
-exports.emberUser = function(mongoUser, currentUser){
+var emberWrapper = exports;
+
+emberWrapper.emberUser = function(mongoUser, currentUser){
 	var user = {
 		'id': 			mongoUser.username,
 		'username': mongoUser.username,
@@ -39,7 +41,7 @@ exports.emberUser = function(mongoUser, currentUser){
 	return user;
 };
 
-exports.emberPost = function(mongoPost){
+emberWrapper.emberPost = function(mongoPost){
 	var post = {
     'id':       mongoPost._id,
     'body':     mongoPost.body,

@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-var userSchema = new mongoose.Schema({
+module.exports.userSchema = new mongoose.Schema({
   username:   					 String,
   email:     						 String,
   name:      	  				 String,
@@ -10,5 +10,3 @@ var userSchema = new mongoose.Schema({
   followers:  					 [{type: String}],
   date: {type: Date, default: Date.now}
 });
-
-module.exports = mongoose.model('User', userSchema);

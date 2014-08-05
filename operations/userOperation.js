@@ -2,12 +2,14 @@ var passport = require('passport'),
     bcrypt = require('bcrypt'),
     config = require('../config');
 require('../authentications/passport')(passport);
+var conn = require('../dbconnection');
 
-var User = require('../models/user'),
+var User = conn.model('User')
     emberObjWrapper = require('../wrappers/emberObjWrapper'),
     resetPass = require('../resetPass/sendNewPass');
-
-exports.checkLoggedInUserExistance = function(req, res){
+    userOperation = exports;
+    
+userOperation.checkLoggedInUserExistance = function(req, res){
   // console.log('req.user: ' + req.user);
   // console.log('Before req.user : isAuthenticated = ' + req.isAuthenticated());
   if (req.user){
@@ -17,7 +19,7 @@ exports.checkLoggedInUserExistance = function(req, res){
   }
 };
 
-exports.register = function(req, res){
+userOperation.register = function(req, res){
   var randomNum = Math.floor(5*Math.random()),
       avatar = 'images/avatar-'+randomNum+'.png',
       hasedPassword;
@@ -43,37 +45,41 @@ exports.register = function(req, res){
   });
 };
 
-exports.userQueryHandlers = function(req, res, next){
+function getFollowees(res, currentUserAsFollower, authenticatedUser){
+  var emberFollowees = [];
+  User.find({'followers': currentUserAsFollower}).sort({date:-1}).limit(20).exec(function(err, followees){
+    if(followees){
+      followees.forEach(function(user){
+        emberFollowees.push(emberObjWrapper.emberUser(user, authenticatedUser));
+      })
+      return res.send(200, {users: emberFollowees});
+    } else {
+      return res.send(200, []);
+    };
+  });
+}
+
+function getFollowers(res, currentUserAsFollowee, authenticatedUser){
+  var emberFollowers = [];
+  User.find({'followees': currentUserAsFollowee}).sort({date:-1}).limit(20).exec(function(err, followers){
+    if(followers){
+      followers.forEach( function(user){
+        emberFollowers.push(emberObjWrapper.emberUser(user, authenticatedUser));
+      })
+      return res.send(200, {users: emberFollowers});
+    } else {
+      return res.send(200, []);
+    };
+  });
+}
+
+userOperation.userQueryHandlers = function(req, res, next){
   var username      = req.query.username,
       password      = req.query.password,
       email         = req.query.email,
       operation     = req.query.operation,
       currentUserAsFollower = req.query.follower,
       currentUserAsFollowee = req.query.followee;
-
-  function getFollowees(currentUserAsFollower, authenticatedUser){
-    var emberFollowees = [];
-    User.find({'followers': currentUserAsFollower}).sort({date:-1}).limit(20).exec(function(err, followees){
-      if(followees){
-        followees.forEach(function(user){
-          emberFollowees.push(emberObjWrapper.emberUser(user, authenticatedUser));
-        })
-        return res.send(200, {users: emberFollowees});
-      };
-    });
-  }
-
-  function getFollowers(currentUserAsFollowee, authenticatedUser){
-    var emberFollowers = [];
-    User.find({'followees': currentUserAsFollowee}).sort({date:-1}).limit(20).exec(function(err, followers){
-      if(followers){
-        followers.forEach( function(user){
-          emberFollowers.push(emberObjWrapper.emberUser(user, authenticatedUser));
-        })
-        return res.send(200, {users: emberFollowers});
-      };
-    });
-  }
 
   if(operation == 'login'){
     passport.authenticate('local', function(err, user, info) {
@@ -84,17 +90,20 @@ exports.userQueryHandlers = function(req, res, next){
         return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
       });
     })(req, res, next);
+
   } else if(currentUserAsFollower){ //GET Followees of current URL user
-    getFollowees(currentUserAsFollower, req.user.username);
-  }
-  else if(currentUserAsFollowee){ //GET Followers of current URL user
-    getFollowers(currentUserAsFollowee, req.user.username);
+    getFollowees(res, currentUserAsFollower, req.user.username);
+
+  } else if(currentUserAsFollowee){ //GET Followers of current URL user
+    getFollowers(res, currentUserAsFollowee, req.user.username);
+
   } else if(operation == 'resetPassword' && username && email){
     resetPass.sendNewPass(req, res, username, email);
+
   }
 };
 
-exports.getUser = function(req, res){
+userOperation.getUser = function(req, res){
   function getTheUser(user_id, authenticatedUser){
     User.findOne({'username': userId}, function(err, user){
       if(user != null) { 
@@ -127,7 +136,7 @@ exports.getUser = function(req, res){
   }
 };
 
-exports.logout = function(req, res){
+userOperation.logout = function(req, res){
   req.logout();
   res.send(200);
 };

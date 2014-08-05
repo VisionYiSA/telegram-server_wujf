@@ -7,23 +7,15 @@ var express = require('express'),
     passport = require('passport'),
     ensureAuthenticated = require('./authentications/ensureAuthenticated'),
 
-    mongoose = require('mongoose'),
+    // mongoose = require('mongoose'),
     MongoStore = require('connect-mongostore')(session),
-
-    User = require('./models/user'),
-    Post = require('./models/post'),
 
     userOperation = require('./operations/userOperation'),
     postOperation = require('./operations/postOperation'),
     userPageOperation = require('./operations/userPageOperation'),
     emberObjWrapper = require('./wrappers/emberObjWrapper');
-    // email = require('./email/resetPassword');
 
-mongoose.connect('mongodb://127.0.0.1/telegram', 
-  function(err){
-    if(err) return console.log(err);
-    // console.log('***** Connected to MongoDB *****')
-});
+    require('./dbconnection').createConnection();
 
 // =========== Config ===========
 app.use(bodyParser());

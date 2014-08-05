@@ -1,8 +1,11 @@
+var conn = require('../dbconnection');
 var bcrypt = require('bcrypt'),
     md5    = require('MD5'),
     config = require('../config'),
-    User   = require('../models/user'),
+    User   = conn.model('User'),
     emberObjWrapper = require('../wrappers/emberObjWrapper');
+
+var sendEmail = exports;
 
 function emailTemplate(username, password){
   var htmlMsg = 
@@ -29,7 +32,7 @@ function newPassword(){
   return newPass;
 }
 
-exports.sendNewPass = function(req, res, username, email){
+sendEmail.sendNewPass = function(req, res, username, email){
   User.findOne({'username': username}, function(err, user){
     if(user && email == user.email) { 
       var Mailgun = require('mailgun-js');
