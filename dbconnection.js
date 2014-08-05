@@ -14,8 +14,8 @@ exports.createConnection = function(){
 
 exports.model = function(model){
 	if(model == 'Post'){
-		mongoose.model('Post', postModel.postSchema);
+		return mongoose.model('Post', postModel.postSchema);
 	} else if(model == 'User'){
-		mongoose.model('User', userModel.userSchema);
+		return mongoose.model('User', userModel.userSchema);
 	}
 }
