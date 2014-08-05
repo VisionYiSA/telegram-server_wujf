@@ -69,4 +69,6 @@ Keys: ember styled object? Array/Object?
 * fixed some issues for displaying posts above [commits here](https://gist.github.com/yhagio/9224cccb652a9a106096)
 * User can reset password / sent by email (Mailgun) [Commits](https://gist.github.com/yhagio/9c6ac9f185bea1dca5b8)
 * Securing password: [commits](https://gist.github.com/yhagio/4eb3ee7309231cdd4017)
+* Refactoring :Focus on Model + DB Connection: [gists]()
+* nlogger debug [gists]()
 

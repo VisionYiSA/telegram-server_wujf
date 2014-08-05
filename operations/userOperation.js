@@ -1,6 +1,8 @@
 var passport = require('passport'),
     bcrypt = require('bcrypt'),
-    config = require('../config');
+    config = require('../config'),
+    logger = require('nlogger').logger(module);
+
 require('../authentications/passport')(passport);
 var conn = require('../dbconnection');
 
@@ -34,10 +36,12 @@ userOperation.register = function(req, res){
         password: hasedPassword,
         avatar:   avatar
       });
+      logger.info('newUser = '+newUser);
 
       newUser.save(function(err, user){
         req.login(user, function(err) { // Set cookie here 
           if (err) { return res.send(400); }  
+          logger.info('emberObjWrapper.emberUser(user) = '+emberObjWrapper.emberUser(user));
           return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
         });
       });
@@ -52,6 +56,7 @@ function getFollowees(res, currentUserAsFollower, authenticatedUser){
       followees.forEach(function(user){
         emberFollowees.push(emberObjWrapper.emberUser(user, authenticatedUser));
       })
+      logger.info('emberFollowees: '+emberFollowees);
       return res.send(200, {users: emberFollowees});
     } else {
       return res.send(200, []);
@@ -66,6 +71,7 @@ function getFollowers(res, currentUserAsFollowee, authenticatedUser){
       followers.forEach( function(user){
         emberFollowers.push(emberObjWrapper.emberUser(user, authenticatedUser));
       })
+      logger.info('emberFollowees: '+emberFollowers);
       return res.send(200, {users: emberFollowers});
     } else {
       return res.send(200, []);
@@ -86,7 +92,8 @@ userOperation.userQueryHandlers = function(req, res, next){
       if (err) { return res.send(400); }
       if (!user) { return res.send(400); }
       req.login(user, function(err) { // Set cookie here 
-        if (err) { return res.send(400); }
+        if (err) { logger.error(err); return res.send(400); }
+        logger.info('emberObjWrapper.emberUser(user): '+emberObjWrapper.emberUser(user));
         return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
       });
     })(req, res, next);
@@ -108,11 +115,14 @@ userOperation.getUser = function(req, res){
     User.findOne({'username': userId}, function(err, user){
       if(user != null) { 
         if(authenticatedUser){
+          logger.info('getTheUser: '+ emberObjWrapper.emberUser(user, authenticatedUser));
           return res.send(200, {user: emberObjWrapper.emberUser(user, authenticatedUser)});
         } else {
+          logger.info('getTheUser: '+ emberObjWrapper.emberUser(user));
           return res.send(200, {user: emberObjWrapper.emberUser(user)});
         }
       } else {
+        logger.error('404');
         return res.send(404);
       }
     });  
@@ -123,6 +133,7 @@ userOperation.getUser = function(req, res){
       var userId = req.params.user_id;
       getTheUser(userId);
     } else {
+      logger.error('404');
       return res.send(404);
     }  
   } else {
@@ -131,6 +142,7 @@ userOperation.getUser = function(req, res){
     if(authenticatedUser && userId){
       getTheUser(userId, authenticatedUser);
     } else {
+      logger.error('404');
       return res.send(404);
     }  
   }
@@ -138,5 +150,6 @@ userOperation.getUser = function(req, res){
 
 userOperation.logout = function(req, res){
   req.logout();
+  logger.info('Logged Out Successfully');
   res.send(200);
 };

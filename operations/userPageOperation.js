@@ -4,10 +4,11 @@ var conn = require('../dbconnection');
 var async = require("async"),
 		User = conn.model('User'),
 		Post = conn.model('User'),
-		userPageOperation = exports;
+		userPageOperation = exports,
+		logger = require('nlogger').logger(module);
 		
 userPageOperation.follow = function(req, res){
-	console.log('===== F O L L O W ===== ');
+	logger.info('===== F O L L O W ===== ');
 	var newFollowingUser = req.query.user,
 			loggedInUser 		 = req.user.username,
 			asyncTasks 			 = [];
@@ -16,8 +17,8 @@ userPageOperation.follow = function(req, res){
 		var query  = {username: loggedInUser};
 		var update = {$addToSet: {followees: newFollowingUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			// console.log('===== updateFollowees ===== ');
-			// console.log(result.username + "'s followees: " + result.followees);
+			logger.info('===== updateFollowees ===== ');
+			logger.info(result.username + "'s followees: " + result.followees);
 		});
 		callback();
 	}
@@ -26,8 +27,8 @@ userPageOperation.follow = function(req, res){
 		var query  = {username: newFollowingUser};
 		var update = {$addToSet: {followers: loggedInUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			// console.log('==== updateFollowers =====');
-			// console.log(result.username + "'s followers: " + result.followers);
+			logger.info('==== updateFollowers =====');
+			logger.info(result.username + "'s followers: " + result.followers);
 		});
 		callback();
 	}
@@ -37,17 +38,17 @@ userPageOperation.follow = function(req, res){
 
 	async.parallel(asyncTasks, function(err, result){
 		if(err){
-			console.log("FAILED!");
+			logger.error(err);
 			return res.send(500);
 		} else {
-			console.log("NO ERROR ON FOLLOW");
+			logger.info("NO ERROR ON FOLLOW");
 			return res.send(200);
 		}
 	});
 };
 
 userPageOperation.unfollow = function(req, res, next){
-	// console.log('===== U N F O L L O W ===== ');
+	logger.info('===== U N F O L L O W ===== ');
 	var userToUnfollow = req.query.user,
 	    loggedInUser 	 = req.user.username,
 		  asyncTasks 		 = [];
@@ -56,8 +57,8 @@ userPageOperation.unfollow = function(req, res, next){
 		var query  = {username: loggedInUser};
 		var update = {$pull: {followees: userToUnfollow}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			// console.log('===== updateFollowees ===== ');
-			// console.log(result.username + "'s followees: " + result.followees);
+			logger.info('===== updateFollowees ===== ');
+			logger.info(result.username + "'s followees: " + result.followees);
 		});
 		callback();
 	}
@@ -66,8 +67,8 @@ userPageOperation.unfollow = function(req, res, next){
 		var query  = {username: userToUnfollow};
 		var update = {$pull: {followers: loggedInUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			// console.log('==== updateFollowers =====');
-			// console.log(result.username + "'s followers: " + result.followers);
+			logger.info('==== updateFollowers =====');
+			logger.info(result.username + "'s followers: " + result.followers);
 		});
 		callback();
 	}
@@ -77,10 +78,10 @@ userPageOperation.unfollow = function(req, res, next){
 
 	async.parallel(asyncTasks, function(err, result){
 		if(err){
-			// console.log("FAILED!");
+			logger.error(err);
 			return res.send(500);
 		} else {
-			// console.log("NO ERROR ON UNFOLLOW");
+			logger.info("NO ERROR ON UNFOLLOW");
 			return res.send(200);
 		}
 	});

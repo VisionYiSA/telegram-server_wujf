@@ -6,6 +6,7 @@ var express = require('express'),
 
     passport = require('passport'),
     ensureAuthenticated = require('./authentications/ensureAuthenticated'),
+    logger = require('nlogger').logger(module),
 
     // mongoose = require('mongoose'),
     MongoStore = require('connect-mongostore')(session),
@@ -50,5 +51,5 @@ app.get('/api/follow', userPageOperation.follow);
 app.get('/api/unfollow', userPageOperation.unfollow);
 
 var server = app.listen(3000, function(){
-  console.log('Listening on port %d', server.address().port);
+  logger.info('Listening on port %d', server.address().port);
 });

@@ -1,13 +1,14 @@
+var logger = require('nlogger').logger(module);
 // Check if the current user follows mongoUser
 // (Check if mongoUser is followed by current user)
 function isCurrentUserFollowing(mongoUser, currentUser){
-	console.log(' ');
-	console.log('=== is '+mongoUser.username+' Followed by '+currentUser+' ? ===');
+	logger.info(' ');
+	logger.info('=== is '+mongoUser.username+' Followed by '+currentUser+' ? ===');
 	if(mongoUser.followers.indexOf(currentUser) >= 0){
-		console.log('TRUE!');
+		logger.info('isCurrentUserFollowing?: True')
 		return true;
 	} else {
-		console.log('NO!');
+		logger.error('isCurrentUserFollowing?: false');
 		return false;
 	}
 };
@@ -15,13 +16,13 @@ function isCurrentUserFollowing(mongoUser, currentUser){
 // Check if mongoUser follows the current user
 // (Check if current user is followed by mongoUser)
 var isCurrentUserFollowed = function(mongoUser, currentUser){
-	console.log(' ');
-	console.log('=== is '+mongoUser.username+' Following '+currentUser+' ? ===');
+	logger.info(' ');
+	logger.info('=== is '+mongoUser.username+' Following '+currentUser+' ? ===');
 	if(mongoUser.followees.indexOf(currentUser) >= 0){
-		console.log('TRUE!');
+		logger.info('isCurrentUserFollowed?: True')
 		return true;
 	} else {
-		console.log('NO!');
+		logger.info('isCurrentUserFollowed?: False')
 		return false;
 	}
 };

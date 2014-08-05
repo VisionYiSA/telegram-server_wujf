@@ -1,8 +1,9 @@
-var conn = require('../dbconnection');
-var User = conn.model('User');
-var Post = conn.model('Post');
-var emberObjWrapper = require('../wrappers/emberObjWrapper');
-var postOperation = exports;
+var conn = require('../dbconnection'),
+    User = conn.model('User'),
+    Post = conn.model('Post'),
+    emberObjWrapper = require('../wrappers/emberObjWrapper'),
+    postOperation = exports,
+    logger = require('nlogger').logger(module);
 
 postOperation.getPosts = function(req, res){
   var followeesOf = req.query.followeesOf;
@@ -20,6 +21,7 @@ postOperation.getPosts = function(req, res){
           }
         )
       }
+      logger.info(emberUserPosts);
       return res.send(200, {posts: emberUserPosts}); 
     });
   } else if(!userId && authenticatedUser.username === followeesOf){ // For authenticated user to see posts from followees
@@ -42,6 +44,7 @@ postOperation.getPosts = function(req, res){
       return res.send(200, {posts: emberUserPosts}); 
     });
   } else {
+    logger.error('404');
     return res.send(404);
   }
 };
@@ -54,11 +57,12 @@ postOperation.publishPost = function(req, res){
     });
  
     newPost.save(function(err, post){
-      if(err) return console.log(err);
+      if(err) return logger.error(err);
       return res.send(200, {post: emberObjWrapper.emberPost(post)}); // Not array - singular
     });
 
   } else {
+    logger.error('403');
     res.send(403);
   }
 };
@@ -68,7 +72,7 @@ postOperation.deletePost =  function(req, res){
   Post.findById(postToDelete, function(err, post){
     if(err) console.log(err);
     post.remove(function(err){
-      if(err) console.log(err);
+      if(err) logger.error(err);
       return res.send(200);
     });
   });

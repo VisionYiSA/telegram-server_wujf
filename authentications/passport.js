@@ -1,10 +1,12 @@
 
 var passport = require('passport'),
-    bcrypt = require('bcrypt');
-var LocalStrategy = require('passport-local').Strategy;
-var conn = require('../dbconnection');
-var User = conn.model('User');
+    bcrypt = require('bcrypt'),
+    LocalStrategy = require('passport-local').Strategy,
+    conn = require('../dbconnection'),
+    User = conn.model('User'),
+    logger = require('nlogger').logger(module);
 
+logger.error(conn)
 
 module.exports = function(passport) {
   passport.serializeUser(function(user, done) { // Sets Cookie on login
@@ -13,6 +15,7 @@ module.exports = function(passport) {
 
   passport.deserializeUser(function(id, done) { // Check user's cookie
     User.findOne({'_id': id}, function(err, user){ // instead of find()
+      if(err) logger.error(err);
       done(err, user);
     });
   });
@@ -25,7 +28,7 @@ module.exports = function(passport) {
         'username': username
       }, function(err, user){
         console.log(' ====== before bcrypt.compare ======');
-        if(err){ return done(err); }
+        if(err){ logger.error(err); return done(err); }
         if(!user){ return done(null, false); }
         // console.log('Password: ' + password);
         // console.log('User.password: ' + user.password);
@@ -36,7 +39,7 @@ module.exports = function(passport) {
             // console.log(res);
             return done(null, user);
           } else {
-            // console.log('ERROR')
+            logger.error(err);
             return done(null, false);
           }
         });

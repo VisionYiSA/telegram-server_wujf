@@ -3,7 +3,8 @@ var bcrypt = require('bcrypt'),
     md5    = require('MD5'),
     config = require('../config'),
     User   = conn.model('User'),
-    emberObjWrapper = require('../wrappers/emberObjWrapper');
+    emberObjWrapper = require('../wrappers/emberObjWrapper'),
+    logger = require('nlogger').logger(module);
 
 var sendEmail = exports;
 
@@ -29,6 +30,7 @@ function newPassword(){
   for( var i=0; i < 10; i++ ){
     newPass += letterNumMix.charAt(Math.floor(Math.random() * letterNumMix.length));
   }
+  logger.info(newPass);
   return newPass;
 }
 
@@ -50,22 +52,23 @@ sendEmail.sendNewPass = function(req, res, username, email){
 
       mailgun.messages().send(data, function (error, body) {
         if(error){
+          logger.error(error);
           return res.send(500);
         } else {
-          console.log(body);
+          logger.info(body);
           var newMD5Pass = md5(newPass);
           bcrypt.genSalt(10, function(err, salt) {
             bcrypt.hash(newMD5Pass, salt, function(err, hash) {
               user.password = hash;
               user.save();
-              // console.log(user);
+              logger.info(emberObjWrapper.emberUser(user));
               return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
             });
           });
         }
       });
     } else {
-      console.log('====== User Not Found =======');
+      logger.error('====== User Not Found =======');
       return res.send(404);
     }
   });
