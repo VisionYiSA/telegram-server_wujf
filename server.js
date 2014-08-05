@@ -14,9 +14,9 @@ var express = require('express'),
     userOperation = require('./operations/userOperation'),
     postOperation = require('./operations/postOperation'),
     userPageOperation = require('./operations/userPageOperation'),
-    emberObjWrapper = require('./wrappers/emberObjWrapper');
-
-    require('./dbconnection').createConnection();
+    emberObjWrapper = require('./wrappers/emberObjWrapper'),
+    config   = require('./config');
+    require('./dbconnection').defaultConnection;
 
 // =========== Config ===========
 app.use(bodyParser());
@@ -50,6 +50,6 @@ app.delete('/api/posts/:post_id', postOperation.deletePost);
 app.get('/api/follow', userPageOperation.follow);
 app.get('/api/unfollow', userPageOperation.unfollow);
 
-var server = app.listen(3000, function(){
+var server = app.listen(config.port, function(){
   logger.info('Listening on port %d', server.address().port);
 });

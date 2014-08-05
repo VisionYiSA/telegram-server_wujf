@@ -1,4 +1,4 @@
-var conn = require('../dbconnection');
+var conn = require('../dbconnection').defaultConnection;
 var bcrypt = require('bcrypt'),
     md5    = require('MD5'),
     config = require('../config'),

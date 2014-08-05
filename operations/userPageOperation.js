@@ -1,6 +1,6 @@
 var passport = require('passport');
 require('../authentications/passport')(passport);
-var conn = require('../dbconnection');
+var conn = require('../dbconnection').defaultConnection;
 var async = require("async"),
 		User = conn.model('User'),
 		Post = conn.model('User'),

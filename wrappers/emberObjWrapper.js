@@ -39,6 +39,7 @@ emberWrapper.emberUser = function(mongoUser, currentUser){
 		'followedByCurrentUser': currentUser ? isCurrentUserFollowing(mongoUser, currentUser): false,
 		'followingCurrentUser':  currentUser ? isCurrentUserFollowed(mongoUser, currentUser) : false
 	};
+	logger.info('emberUser: '+user);
 	return user;
 };
 

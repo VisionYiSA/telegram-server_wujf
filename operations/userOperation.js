@@ -4,7 +4,7 @@ var passport = require('passport'),
     logger = require('nlogger').logger(module);
 
 require('../authentications/passport')(passport);
-var conn = require('../dbconnection');
+var conn = require('../dbconnection').defaultConnection;
 
 var User = conn.model('User')
     emberObjWrapper = require('../wrappers/emberObjWrapper'),
@@ -49,35 +49,72 @@ userOperation.register = function(req, res){
   });
 };
 
-function getFollowees(res, currentUserAsFollower, authenticatedUser){
+function getFollowees(currentUserAsFollower, authenticatedUser){
   var emberFollowees = [];
   User.find({'followers': currentUserAsFollower}).sort({date:-1}).limit(20).exec(function(err, followees){
-    if(followees){
-      followees.forEach(function(user){
-        emberFollowees.push(emberObjWrapper.emberUser(user, authenticatedUser));
-      })
-      logger.info('emberFollowees: '+emberFollowees);
-      return res.send(200, {users: emberFollowees});
+    if(err){
+      logger.error(err);
     } else {
-      return res.send(200, []);
-    };
+      if(followees){
+        logger.info('followees: '+followees);
+        followees.forEach(function(user){
+          emberFollowees.push(emberObjWrapper.emberUser(user, authenticatedUser));
+        })
+      };
+      logger.info('emberFollowees: '+emberFollowees[0]);
+      return emberFollowees;
+    }
   });
 }
 
-function getFollowers(res, currentUserAsFollowee, authenticatedUser){
+function getFollowers(currentUserAsFollowee, authenticatedUser){
   var emberFollowers = [];
   User.find({'followees': currentUserAsFollowee}).sort({date:-1}).limit(20).exec(function(err, followers){
-    if(followers){
-      followers.forEach( function(user){
-        emberFollowers.push(emberObjWrapper.emberUser(user, authenticatedUser));
-      })
-      logger.info('emberFollowees: '+emberFollowers);
-      return res.send(200, {users: emberFollowers});
+    if(err){ 
+      logger.error(err);
     } else {
-      return res.send(200, []);
-    };
+      if(followers){
+        logger.info(followers);
+        followers.forEach(function(user){
+          logger.info(user);
+          emberFollowers.push(emberObjWrapper.emberUser(user, authenticatedUser));
+        })
+      }
+      logger.info('emberFollowees: '+emberFollowers);
+      return emberFollowers;
+    } 
   });
 }
+
+// function getFollowees(res, currentUserAsFollower, authenticatedUser){
+//   var emberFollowees = [];
+//   User.find({'followers': currentUserAsFollower}).sort({date:-1}).limit(20).exec(function(err, followees){
+//     if(followees){
+//       followees.forEach(function(user){
+//         emberFollowees.push(emberObjWrapper.emberUser(user, authenticatedUser));
+//       })
+//       logger.info('emberFollowees: '+emberFollowees);
+//       return res.send(200, {users: emberFollowees});
+//     } else {
+//       return res.send(200, []);
+//     };
+//   });
+// }
+
+// function getFollowers(res, currentUserAsFollowee, authenticatedUser){
+//   var emberFollowers = [];
+//   User.find({'followees': currentUserAsFollowee}).sort({date:-1}).limit(20).exec(function(err, followers){
+//     if(followers){
+//       followers.forEach( function(user){
+//         emberFollowers.push(emberObjWrapper.emberUser(user, authenticatedUser));
+//       })
+//       logger.info('emberFollowees: '+emberFollowers);
+//       return res.send(200, {users: emberFollowers});
+//     } else {
+//       return res.send(200, []);
+//     };
+//   });
+// }
 
 userOperation.userQueryHandlers = function(req, res, next){
   var username      = req.query.username,
@@ -85,7 +122,8 @@ userOperation.userQueryHandlers = function(req, res, next){
       email         = req.query.email,
       operation     = req.query.operation,
       currentUserAsFollower = req.query.follower,
-      currentUserAsFollowee = req.query.followee;
+      currentUserAsFollowee = req.query.followee,
+      authenticatedUser = req.user.username;
 
   if(operation == 'login'){
     passport.authenticate('local', function(err, user, info) {
@@ -99,14 +137,31 @@ userOperation.userQueryHandlers = function(req, res, next){
     })(req, res, next);
 
   } else if(currentUserAsFollower){ //GET Followees of current URL user
-    getFollowees(res, currentUserAsFollower, req.user.username);
+    return res.send(200, {users: getFollowees(currentUserAsFollower, authenticatedUser)});
+
+    // var emberFollowees = [];
+    // User.find({'followers': currentUserAsFollower}).sort({date:-1}).limit(20).exec(function(err, followees){
+    //   if(err){
+    //     logger.error(err);
+    //     return res.send(404);
+    //   } else {
+    //     if(followees){
+    //       followees.forEach(function(user){
+    //         emberFollowees.push(emberObjWrapper.emberUser(user, authenticatedUser));
+    //       })
+    //       logger.info('emberFollowees: '+emberFollowees);
+    //       logger.info(emberFollowees[0]);
+    //     };
+    //     // return emberFollowees;
+    //     return res.send(200, {users: emberFollowees})
+    //   }
+    // });
 
   } else if(currentUserAsFollowee){ //GET Followers of current URL user
-    getFollowers(res, currentUserAsFollowee, req.user.username);
+    return res.send(200, {users: getFollowers(currentUserAsFollowee, authenticatedUser)});
 
   } else if(operation == 'resetPassword' && username && email){
     resetPass.sendNewPass(req, res, username, email);
-
   }
 };
 

@@ -1,4 +1,4 @@
-var conn = require('../dbconnection'),
+var conn = require('../dbconnection').defaultConnection,
     User = conn.model('User'),
     Post = conn.model('Post'),
     emberObjWrapper = require('../wrappers/emberObjWrapper'),

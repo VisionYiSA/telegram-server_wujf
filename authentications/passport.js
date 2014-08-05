@@ -2,7 +2,7 @@
 var passport = require('passport'),
     bcrypt = require('bcrypt'),
     LocalStrategy = require('passport-local').Strategy,
-    conn = require('../dbconnection'),
+    conn = require('../dbconnection').defaultConnection,
     User = conn.model('User'),
     logger = require('nlogger').logger(module);
 
