@@ -6,10 +6,10 @@ var passport = require('passport'),
     User = conn.model('User'),
     logger = require('nlogger').logger(module);
 
-// logger.error(conn)
-
 module.exports = function(passport) {
+  logger.info('==== Passport ====');
   passport.serializeUser(function(user, done) { // Sets Cookie on login
+    logger.error('user._id: '+user._id);
     done(null, user._id);
   });
 
@@ -27,19 +27,19 @@ module.exports = function(passport) {
       User.findOne({
         'username': username
       }, function(err, user){
-        console.log(' ====== before bcrypt.compare ======');
+        logger.info(' ====== before bcrypt.compare ======');
         if(err){ logger.error(err); return done(err); }
         if(!user){ return done(null, false); }
-        // console.log('Password: ' + password);
-        // console.log('User.password: ' + user.password);
+        logger.info('Password: ' + password);
+        logger.info('User.password: ' + user.password);
         bcrypt.compare(password, user.password, function(err, res) {
-          // console.log('Password - 2: ' + password);
-          // console.log('User.password - 2: ' + user.password);
+          logger.info('Password - bcrypt.compare: ' + password);
+          logger.info('User.password - bcrypt.compare: ' + user.password);
           if(res) {
-            // console.log(res);
+            logger.info('res: '+res);
             return done(null, user);
           } else {
-            logger.error(err);
+            logger.error('err: '+err);
             return done(null, false);
           }
         });

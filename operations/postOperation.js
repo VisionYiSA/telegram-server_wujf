@@ -11,8 +11,10 @@ postOperation.getPosts = function(req, res){
   var userId = req.query.user;
   var emberUserPosts = [];
 
+  logger.info('==+++ getPosts +++==');
   if(userId){
     // At UserRoute
+    logger.info(" ========== userId =========== ");
     Post.find({'user': userId}).sort({date:-1}).limit(20).exec(function(err, posts){
       if(posts != null) {
         posts.forEach(
@@ -21,11 +23,11 @@ postOperation.getPosts = function(req, res){
           }
         )
       }
-      logger.info(emberUserPosts);
+      logger.info('emberUserPosts: '+emberUserPosts);
       return res.send(200, {posts: emberUserPosts}); 
     });
   } else if(!userId && authenticatedUser.username === followeesOf){ // For authenticated user to see posts from followees
-    console.log(" ========== !userId && authenticatedUser =========== ");
+    logger.info(" ========== !userId && authenticatedUser =========== ");
     Post.find(
       {$or: 
         [
@@ -35,12 +37,14 @@ postOperation.getPosts = function(req, res){
       }
     ).sort({date:-1}).limit(20).exec(function(err, posts){
       if(posts != null) {
+        logger.info('posts: '+posts);
         posts.forEach(
           function(post){
             emberUserPosts.push(emberObjWrapper.emberPost(post));
           }
         )
       }
+      logger.info('emberUserPosts: '+emberUserPosts);
       return res.send(200, {posts: emberUserPosts}); 
     });
   } else {
@@ -50,12 +54,13 @@ postOperation.getPosts = function(req, res){
 };
  
 postOperation.publishPost = function(req, res){
+  logger.info('==== publishPost ====');
   if(req.user.username == req.body.post.user){
     var newPost = new Post({
       body: req.body.post.body,
       user: req.body.post.user,
     });
- 
+    logger.info('newPost: '+newPost);
     newPost.save(function(err, post){
       if(err) return logger.error(err);
       return res.send(200, {post: emberObjWrapper.emberPost(post)}); // Not array - singular
@@ -69,8 +74,9 @@ postOperation.publishPost = function(req, res){
  
 postOperation.deletePost =  function(req, res){
   var postToDelete = req.params.post_id;
+  logger.info(' Deleting this post id: '+postToDelete)
   Post.findById(postToDelete, function(err, post){
-    if(err) console.log(err);
+    if(err) logger.error(err);
     post.remove(function(err){
       if(err) logger.error(err);
       return res.send(200);

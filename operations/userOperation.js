@@ -12,8 +12,8 @@ var User = conn.model('User')
     userOperation = exports;
     
 userOperation.checkLoggedInUserExistance = function(req, res){
-  // console.log('req.user: ' + req.user);
-  // console.log('Before req.user : isAuthenticated = ' + req.isAuthenticated());
+  // logger.info('req.user: ' + req.user);
+  // logger.info('Before req.user : isAuthenticated = ' + req.isAuthenticated());
   if (req.user){
     return res.send(200, {user: emberObjWrapper.emberUser(req.user)});
   } else {
@@ -77,7 +77,7 @@ function getFollowers(currentUserAsFollowee, authenticatedUser, callback){
       if(followers){
         // logger.info('followers: '+followers);
         followers.forEach(function(user){
-          // logger.info('user '+user);
+          logger.info('Each follower username '+user.username);
           emberFollowers.push(emberObjWrapper.emberUser(user, authenticatedUser));
         })
       }
