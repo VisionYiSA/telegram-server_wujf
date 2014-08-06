@@ -6,7 +6,7 @@ var passport = require('passport'),
     User = conn.model('User'),
     logger = require('nlogger').logger(module);
 
-logger.error(conn)
+// logger.error(conn)
 
 module.exports = function(passport) {
   passport.serializeUser(function(user, done) { // Sets Cookie on login

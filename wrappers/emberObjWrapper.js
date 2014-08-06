@@ -2,7 +2,6 @@ var logger = require('nlogger').logger(module);
 // Check if the current user follows mongoUser
 // (Check if mongoUser is followed by current user)
 function isCurrentUserFollowing(mongoUser, currentUser){
-	logger.info(' ');
 	logger.info('=== is '+mongoUser.username+' Followed by '+currentUser+' ? ===');
 	if(mongoUser.followers.indexOf(currentUser) >= 0){
 		logger.info('isCurrentUserFollowing?: True')
@@ -16,7 +15,6 @@ function isCurrentUserFollowing(mongoUser, currentUser){
 // Check if mongoUser follows the current user
 // (Check if current user is followed by mongoUser)
 var isCurrentUserFollowed = function(mongoUser, currentUser){
-	logger.info(' ');
 	logger.info('=== is '+mongoUser.username+' Following '+currentUser+' ? ===');
 	if(mongoUser.followees.indexOf(currentUser) >= 0){
 		logger.info('isCurrentUserFollowed?: True')
