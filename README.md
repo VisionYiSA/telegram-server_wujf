@@ -73,3 +73,5 @@ Keys: ember styled object? Array/Object?
 * nlogger debug
 * Refactor: GetFollowers/Followees in userOperation.js [gists](https://gist.github.com/yhagio/2f89fbd54c0979e41f1f)
 
+**Step-8-sideloaded branch**
+* sideloaded relationships(posts & users): [gists](https://gist.github.com/yhagio/6dd3bbc910720f84cc34)
