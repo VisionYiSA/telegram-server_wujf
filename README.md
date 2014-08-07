@@ -62,3 +62,14 @@ Keys: ember styled object? Array/Object?
 **Follow others**: gists - [https://gist.github.com/yhagio/605e5baace6854b1ec68](https://gist.github.com/yhagio/605e5baace6854b1ec68)
 * Follow function
 * At URL `users/:username/followings` Returns the following users of the user(:username), similar for `/followers`
+
+**Step-7 - SecurePass**
+* Encrypt / Decrypt password on Register & Login using jQuery MD5 on front, bcrypt on back-end.
+* Send Email with new password using Mailgun
+* fixed some issues for displaying posts above [gists](https://gist.github.com/yhagio/9224cccb652a9a106096)
+* User can reset password / sent by email (Mailgun) [gists](https://gist.github.com/yhagio/9c6ac9f185bea1dca5b8)
+* Securing password: [commits](https://gist.github.com/yhagio/4eb3ee7309231cdd4017)
+* Refactoring :Focus on Model + DB Connection: [gists](https://gist.github.com/yhagio/c462b21adf3ad0386f68)
+* nlogger debug
+* Refactor: GetFollowers/Followees in userOperation.js [gists](https://gist.github.com/yhagio/2f89fbd54c0979e41f1f)
+

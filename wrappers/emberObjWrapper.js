@@ -1,13 +1,13 @@
+var logger = require('nlogger').logger(module);
 // Check if the current user follows mongoUser
 // (Check if mongoUser is followed by current user)
-var isCurrentUserFollowing = function(mongoUser, currentUser){
-	console.log(' ');
-	console.log('=== is '+mongoUser.username+' Followed by '+currentUser+' ? ===');
+function isCurrentUserFollowing(mongoUser, currentUser){
+	logger.info('=== is '+mongoUser.username+' Followed by '+currentUser+' ? ===');
 	if(mongoUser.followers.indexOf(currentUser) >= 0){
-		console.log('TRUE!');
+		logger.info('isCurrentUserFollowing?: True')
 		return true;
 	} else {
-		console.log('NO!');
+		logger.error('isCurrentUserFollowing?: false');
 		return false;
 	}
 };
@@ -15,18 +15,19 @@ var isCurrentUserFollowing = function(mongoUser, currentUser){
 // Check if mongoUser follows the current user
 // (Check if current user is followed by mongoUser)
 var isCurrentUserFollowed = function(mongoUser, currentUser){
-	console.log(' ');
-	console.log('=== is '+mongoUser.username+' Following '+currentUser+' ? ===');
+	logger.info('=== is '+mongoUser.username+' Following '+currentUser+' ? ===');
 	if(mongoUser.followees.indexOf(currentUser) >= 0){
-		console.log('TRUE!');
+		logger.info('isCurrentUserFollowed?: True')
 		return true;
 	} else {
-		console.log('NO!');
+		logger.info('isCurrentUserFollowed?: False')
 		return false;
 	}
 };
 
-exports.emberUser = function(mongoUser, currentUser){
+var emberWrapper = exports;
+
+emberWrapper.emberUser = function(mongoUser, currentUser){
 	var user = {
 		'id': 			mongoUser.username,
 		'username': mongoUser.username,
@@ -36,15 +37,17 @@ exports.emberUser = function(mongoUser, currentUser){
 		'followedByCurrentUser': currentUser ? isCurrentUserFollowing(mongoUser, currentUser): false,
 		'followingCurrentUser':  currentUser ? isCurrentUserFollowed(mongoUser, currentUser) : false
 	};
+	logger.info('emberUser: '+user);
 	return user;
 };
 
-exports.emberPost = function(mongoPost){
+emberWrapper.emberPost = function(mongoPost){
 	var post = {
     'id':       mongoPost._id,
     'body':     mongoPost.body,
     'user':     mongoPost.user,
     'date':     mongoPost.date
 	};
+	logger.info('emberPost: '+post);
 	return post;
 }
