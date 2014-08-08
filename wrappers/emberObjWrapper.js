@@ -50,4 +50,17 @@ emberWrapper.emberPost = function(mongoPost){
 	};
 	logger.info('emberPost: '+post);
 	return post;
-}
+};
+
+emberWrapper.emberPostAuthor = function(mongoUser){
+	logger.info('mongoUser');
+	var postUser = {
+		'id': 			mongoUser.username,
+		'username': mongoUser.username,
+		'name': 		mongoUser.name,
+		'email': 		mongoUser.email,
+		'avatar': 	mongoUser.avatar
+	};
+	logger.info(postUser);
+	return postUser;
+};

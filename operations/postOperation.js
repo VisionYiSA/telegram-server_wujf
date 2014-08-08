@@ -10,6 +10,8 @@ postOperation.getPosts = function(req, res){
   var authenticatedUser = req.user;
   var userId = req.query.user;
   var emberUserPosts = [];
+  var postAuthorUsernames = [];
+  var emberPostAuthors = [];
 
   logger.info('==+++ getPosts +++==');
   if(userId){
@@ -20,11 +22,22 @@ postOperation.getPosts = function(req, res){
         posts.forEach(
           function(post){
             emberUserPosts.push(emberObjWrapper.emberPost(post));
+            // logger.info(post);
+            postAuthorUsernames.push(post.user);
           }
         )
       }
-      logger.info('emberUserPosts: '+emberUserPosts);
-      return res.send(200, {posts: emberUserPosts}); 
+      logger.info(postAuthorUsernames);
+      User.find({'username': {$in: postAuthorUsernames}}, function(err, users){
+        users.forEach(
+          function(user){
+            logger.info(user);
+            emberPostAuthors.push(emberObjWrapper.emberPostAuthor(user));
+          }
+        )
+        return res.send(200, {posts: emberUserPosts, users: emberPostAuthors}); 
+      });
+      
     });
   } else if(!userId && authenticatedUser.username === followeesOf){ // For authenticated user to see posts from followees
     logger.info(" ========== !userId && authenticatedUser =========== ");
@@ -37,15 +50,26 @@ postOperation.getPosts = function(req, res){
       }
     ).sort({date:-1}).limit(20).exec(function(err, posts){
       if(posts != null) {
-        logger.info('posts: '+posts);
+        // logger.info('posts: '+posts);
         posts.forEach(
           function(post){
             emberUserPosts.push(emberObjWrapper.emberPost(post));
+            // logger.info(post);
+            postAuthorUsernames.push(post.user);
           }
         )
       }
-      logger.info('emberUserPosts: '+emberUserPosts);
-      return res.send(200, {posts: emberUserPosts}); 
+      logger.info(postAuthorUsernames);
+      User.find({'username': {$in: postAuthorUsernames}}, function(err, users){
+        users.forEach(
+          function(user){
+            logger.info(user);
+            emberPostAuthors.push(emberObjWrapper.emberPostAuthor(user));
+          }
+        )
+        return res.send(200, {posts: emberUserPosts, users: emberPostAuthors});
+      });
+
     });
   } else {
     logger.error('404');
