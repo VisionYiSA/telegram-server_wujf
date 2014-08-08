@@ -52,7 +52,7 @@ emberWrapper.emberPost = function(mongoPost){
 	return post;
 };
 
-emberWrapper.emberPostUser = function(mongoUser){
+emberWrapper.emberPostAuthor = function(mongoUser){
 	logger.info('mongoUser');
 	var postUser = {
 		'id': 			mongoUser.username,
