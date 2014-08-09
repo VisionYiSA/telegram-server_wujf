@@ -79,7 +79,20 @@ postOperation.getPosts = function(req, res){
  
 postOperation.publishPost = function(req, res){
   logger.info('==== publishPost ====');
-  if(req.user.username == req.body.post.user){
+  logger.info('req.body.post.originalAuthor '+req.body.post.originalAuthor);
+
+  if(req.body.post.originalAuthor){
+    var newPost = new Post({
+      body: req.body.post.body,
+      user: req.body.post.user,
+      originalAuthor: req.body.post.originalAuthor
+    });
+    logger.info('newPost: '+newPost);
+    newPost.save(function(err, post){
+      if(err) return logger.error(err);
+      return res.send(200, {post: emberObjWrapper.emberPost(post)}); // Not array - singular
+    });
+  } else if(req.user.username == req.body.post.user){
     var newPost = new Post({
       body: req.body.post.body,
       user: req.body.post.user,
@@ -94,6 +107,8 @@ postOperation.publishPost = function(req, res){
     logger.error('403');
     res.send(403);
   }
+
+
 };
  
 postOperation.deletePost =  function(req, res){

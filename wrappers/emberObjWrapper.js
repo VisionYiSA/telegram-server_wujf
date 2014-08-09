@@ -46,7 +46,8 @@ emberWrapper.emberPost = function(mongoPost){
     'id':       mongoPost._id,
     'body':     mongoPost.body,
     'user':     mongoPost.user,
-    'date':     mongoPost.date
+    'date':     mongoPost.date,
+    'originalAuthor': mongoPost.originalAuthor
 	};
 	logger.info('emberPost: '+post);
 	return post;
