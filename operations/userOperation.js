@@ -93,8 +93,8 @@ userOperation.userQueryHandlers = function(req, res, next){
       email         = req.query.email,
       operation     = req.query.operation,
       currentUserAsFollower = req.query.follower,
-      currentUserAsFollowee = req.query.followee,
-      authenticatedUser = req.user.username;
+      currentUserAsFollowee = req.query.followee;
+      // authenticatedUser = req.user.username;
 
   if(operation == 'login'){
     passport.authenticate('local', function(err, user, info) {
@@ -108,7 +108,7 @@ userOperation.userQueryHandlers = function(req, res, next){
     })(req, res, next);
 
   } else if(currentUserAsFollower){ //GET Followees of current URL user
-    getFollowees(currentUserAsFollower, authenticatedUser, function(err, users){
+    getFollowees(currentUserAsFollower, req.user.username, function(err, users){
       if(err){
         return res.send(404);
       } else if(users){
@@ -119,7 +119,7 @@ userOperation.userQueryHandlers = function(req, res, next){
     });
 
   } else if(currentUserAsFollowee){ //GET Followers of current URL user
-    getFollowers(currentUserAsFollowee, authenticatedUser, function(err, users){
+    getFollowers(currentUserAsFollowee, req.user.username, function(err, users){
       if(err){
         return res.send(404);
       } else if(users){
