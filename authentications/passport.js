@@ -7,7 +7,7 @@ var passport = require('passport'),
     logger = require('nlogger').logger(module);
 
 module.exports = function(passport) {
-  logger.info('==== Passport ====');
+  logger.info('Passport process');
   passport.serializeUser(function(user, done) { // Sets Cookie on login
     logger.error('user._id: '+user._id);
     done(null, user._id);
@@ -15,7 +15,7 @@ module.exports = function(passport) {
 
   passport.deserializeUser(function(id, done) { // Check user's cookie
     User.findOne({'_id': id}, function(err, user){ // instead of find()
-      if(err) logger.error(err);
+      if(err) logger.error('deserializeUser error: ' + err);
       done(err, user);
     });
   });
@@ -27,19 +27,13 @@ module.exports = function(passport) {
       User.findOne({
         'username': username
       }, function(err, user){
-        logger.info(' ====== before bcrypt.compare ======');
-        if(err){ logger.error(err); return done(err); }
+        if(err){ logger.error('On finding user - bcrypt.compare err: '+err); return done(err); }
         if(!user){ return done(null, false); }
-        logger.info('Password: ' + password);
-        logger.info('User.password: ' + user.password);
         bcrypt.compare(password, user.password, function(err, res) {
-          logger.info('Password - bcrypt.compare: ' + password);
-          logger.info('User.password - bcrypt.compare: ' + user.password);
           if(res) {
-            logger.info('res: '+res);
             return done(null, user);
           } else {
-            logger.error('err: '+err);
+            logger.error('Inside - bcrypt.compare err: '+err);
             return done(null, false);
           }
         });

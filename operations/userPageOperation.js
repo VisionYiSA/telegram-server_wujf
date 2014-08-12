@@ -8,7 +8,7 @@ var async = require("async"),
 		logger = require('nlogger').logger(module);
 		
 userPageOperation.follow = function(req, res){
-	logger.info('===== F O L L O W ===== ');
+	logger.info('F O L L O W');
 	var newFollowingUser = req.query.user,
 			loggedInUser 		 = req.user.username,
 			asyncTasks 			 = [];
@@ -17,7 +17,6 @@ userPageOperation.follow = function(req, res){
 		var query  = {username: loggedInUser};
 		var update = {$addToSet: {followees: newFollowingUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			logger.info('===== updateFollowees ===== ');
 			logger.info(result.username + "'s followees: " + result.followees);
 		});
 		callback();
@@ -27,7 +26,6 @@ userPageOperation.follow = function(req, res){
 		var query  = {username: newFollowingUser};
 		var update = {$addToSet: {followers: loggedInUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			logger.info('==== updateFollowers =====');
 			logger.info(result.username + "'s followers: " + result.followers);
 		});
 		callback();
@@ -38,7 +36,7 @@ userPageOperation.follow = function(req, res){
 
 	async.parallel(asyncTasks, function(err, result){
 		if(err){
-			logger.error(err);
+			logger.error('follow - asyncTasks Error: '+err);
 			return res.send(500);
 		} else {
 			logger.info("NO ERROR ON FOLLOW");
@@ -48,7 +46,7 @@ userPageOperation.follow = function(req, res){
 };
 
 userPageOperation.unfollow = function(req, res, next){
-	logger.info('===== U N F O L L O W ===== ');
+	logger.info('U N F O L L O W');
 	var userToUnfollow = req.query.user,
 	    loggedInUser 	 = req.user.username,
 		  asyncTasks 		 = [];
@@ -57,7 +55,6 @@ userPageOperation.unfollow = function(req, res, next){
 		var query  = {username: loggedInUser};
 		var update = {$pull: {followees: userToUnfollow}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			logger.info('===== updateFollowees ===== ');
 			logger.info(result.username + "'s followees: " + result.followees);
 		});
 		callback();
@@ -67,7 +64,6 @@ userPageOperation.unfollow = function(req, res, next){
 		var query  = {username: userToUnfollow};
 		var update = {$pull: {followers: loggedInUser}};
 		User.findOneAndUpdate(query, update, function(err, result){
-			logger.info('==== updateFollowers =====');
 			logger.info(result.username + "'s followers: " + result.followers);
 		});
 		callback();
@@ -78,7 +74,7 @@ userPageOperation.unfollow = function(req, res, next){
 
 	async.parallel(asyncTasks, function(err, result){
 		if(err){
-			logger.error(err);
+			logger.error('unfollow - asyncTasks Error: '+err);
 			return res.send(500);
 		} else {
 			logger.info("NO ERROR ON UNFOLLOW");
