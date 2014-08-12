@@ -30,7 +30,6 @@ function newPassword(){
   for( var i=0; i < 10; i++ ){
     newPass += letterNumMix.charAt(Math.floor(Math.random() * letterNumMix.length));
   }
-  logger.info(newPass);
   return newPass;
 }
 
@@ -52,23 +51,23 @@ sendEmail.sendNewPass = function(req, res, username, email){
 
       mailgun.messages().send(data, function (error, body) {
         if(error){
-          logger.error(error);
+          logger.error('mailgun send error: '+error);
           return res.send(500);
         } else {
-          logger.info(body);
+          logger.info('mail body: '+body);
           var newMD5Pass = md5(newPass);
           bcrypt.genSalt(10, function(err, salt) {
             bcrypt.hash(newMD5Pass, salt, function(err, hash) {
               user.password = hash;
               user.save();
-              logger.info(emberObjWrapper.emberUser(user));
+              logger.info('reset password user: '+emberObjWrapper.emberUser(user));
               return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
             });
           });
         }
       });
     } else {
-      logger.error('====== User Not Found =======');
+      logger.error('User not found for reset password');
       return res.send(404);
     }
   });
