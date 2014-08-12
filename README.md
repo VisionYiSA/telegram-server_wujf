@@ -75,3 +75,7 @@ Keys: ember styled object? Array/Object?
 
 **Step-8-sideloaded branch**
 * sideloaded relationships(posts & users): [gists](https://gist.github.com/yhagio/6dd3bbc910720f84cc34)
+
+**retweet (repost) branch**
+* Repost function: [gists]()
+* Refactored codes: [gists]()
