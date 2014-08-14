@@ -51,23 +51,23 @@ sendEmail.sendNewPass = function(req, res, username, email){
 
       mailgun.messages().send(data, function (error, body) {
         if(error){
-          logger.error('mailgun send error: '+error);
+          logger.error('Error on Sending Email via Mailgun: ', error);
           return res.send(500);
         } else {
-          logger.info('mail body: '+body);
+          logger.info('Mail body: ', body);
           var newMD5Pass = md5(newPass);
           bcrypt.genSalt(10, function(err, salt) {
             bcrypt.hash(newMD5Pass, salt, function(err, hash) {
               user.password = hash;
               user.save();
-              logger.info('reset password user: '+emberObjWrapper.emberUser(user));
+              logger.info('Resetting the password for the user = ',emberObjWrapper.emberUser(user));
               return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
             });
           });
         }
       });
     } else {
-      logger.error('User not found for reset password');
+      logger.error('User not found whom resetting password of');
       return res.send(404);
     }
   });
