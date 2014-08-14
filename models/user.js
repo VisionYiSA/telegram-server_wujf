@@ -5,7 +5,7 @@ module.exports.userSchema = new mongoose.Schema({
   email:     						 String,
   name:      	  				 String,
   password:   					 String,
-  avatar: 							 String, // Uploading photo   
+  avatar: 							 String,
   followees:  					 [{type: String}],
   followers:  					 [{type: String}],
   date: {type: Date, default: Date.now}

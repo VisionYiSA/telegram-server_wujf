@@ -39,7 +39,7 @@ userOperation.register = function(req, res){
       logger.info('Registering User: '+newUser);
 
       newUser.save(function(err, user){
-        req.login(user, function(err) { // Set cookie here 
+        req.login(user, function(err) {
           if (err) { return res.send(400); }  
           logger.info('emberObjWrapper.emberUser(user): '+emberObjWrapper.emberUser(user));
           return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
@@ -50,40 +50,42 @@ userOperation.register = function(req, res){
 };
 
 function getFollowees(currentUserAsFollower, authenticatedUser, callback){
-  logger.info('GET Followees');
+  logger.info("GET ", currentUserAsFollower, " 's followees");
+  logger.info("authenticatedUser: ", authenticatedUser);
   var emberFollowees = [];
   User.find({'followers': currentUserAsFollower}).sort({date:-1}).limit(20).exec(function(err, followees){
     if(err){
-      logger.error('Error: '+err);
+      logger.error('Error on finding followees: ', err);
     } else {
       if(followees){
-        // logger.info('followees: '+followees);
+        logger.info('All the followees: ', followees);
         followees.forEach(function(user){
-          logger.info('A Followee username: '+user.username);
+          logger.info('A followee username: ', user.username);
           emberFollowees.push(emberObjWrapper.emberUser(user, authenticatedUser));
         })
       };
-      logger.info('emberFollowees: '+emberFollowees);
+      logger.info('emberFollowees: ', emberFollowees);
     }
     callback(err, emberFollowees);
   });
 }
 
 function getFollowers(currentUserAsFollowee, authenticatedUser, callback){
-  logger.info('GET Followers');
+  logger.info("GET ", currentUserAsFollowee, " 's followers");
+  logger.info("authenticatedUser: ", authenticatedUser);
   var emberFollowers = [];
   User.find({'followees': currentUserAsFollowee}).sort({date:-1}).limit(20).exec(function(err, followers){
     if(err){ 
-      logger.error(err);
+      logger.error('Error on finding followers: ', err);
     } else {
       if(followers){
-        // logger.info('followers: '+followers);
+        logger.info('All the followers: ', followers);
         followers.forEach(function(user){
-          logger.info('A Follower username: '+user.username);
+          logger.info('A follower username: ', user.username);
           emberFollowers.push(emberObjWrapper.emberUser(user, authenticatedUser));
         })
       }
-      logger.info('emberFollowees: '+emberFollowers);
+      logger.info('emberFollowees: ', emberFollowers);
     } 
     callback(err, emberFollowers);
   });
@@ -96,28 +98,27 @@ userOperation.userQueryHandlers = function(req, res, next){
       operation     = req.query.operation,
       currentUserAsFollower = req.query.follower,
       currentUserAsFollowee = req.query.followee;
-      // authenticatedUser = req.user.username;
 
   if(operation == 'login'){
     logger.info('LOGIN PROCESS');
     passport.authenticate('local', function(err, user, info) {
-      if (err) { return res.send(400); }
+      if (err) { logger.error('Error on passport.authenticate(): ', err); return res.send(400); }
       if (!user) { return res.send(400); }
-      req.login(user, function(err) { // Set cookie here 
-        if (err) { logger.error(err); return res.send(400); }
-        logger.info('emberObjWrapper.emberUser(user): '+emberObjWrapper.emberUser(user));
+      req.login(user, function(err) {
+        if (err) { logger.error('Error on login(): ', err); return res.send(400); }
+        logger.info('emberObjWrapper.emberUser(user): ', emberObjWrapper.emberUser(user));
         return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
       });
     })(req, res, next);
 
-  } else if(currentUserAsFollower){ //GET Followees of current URL user
+  } else if(currentUserAsFollower){
     logger.info('/username/followings PROCESS');
     getFollowees(currentUserAsFollower, req.user.username, function(err, users){
       if(err){
-        logger.error('Error on getFollowees(): '+err);
+        logger.error('Error on getFollowees(): ', err);
         return res.send(404);
       } else if(users){
-        logger.info('Followees: '+users);
+        logger.info('Followees: ', users);
         return res.send(200, {users: users});
       } else {
         logger.error('Internal Server Error 500');
@@ -129,10 +130,10 @@ userOperation.userQueryHandlers = function(req, res, next){
     logger.info('/username/followers PROCESS');
     getFollowers(currentUserAsFollowee, req.user.username, function(err, users){
       if(err){
-        logger.error('Error on getFollowers(): '+err);
+        logger.error('Error on getFollowers(): ', err);
         return res.send(404);
       } else if(users){
-        logger.info('Followers: '+users);
+        logger.info('Followers: ', users);
         return res.send(200, {users: users});
       } else {
         logger.error('Internal Server Error 500');
@@ -146,17 +147,17 @@ userOperation.userQueryHandlers = function(req, res, next){
 };
 
 userOperation.getUser = function(req, res){
-  logger.info('getUser() PROCESS');
+  logger.info('getUser() in PROCESS');
   function getTheUser(user_id, authenticatedUser){
-    User.findOne({'username': userId}, function(err, user){
+    User.findOne({'username': user_id}, function(err, user){
       if(user != null) { 
         if(authenticatedUser){
-          logger.info('Logged In As: '+authenticatedUser);
-          logger.info('getTheUser: '+ emberObjWrapper.emberUser(user, authenticatedUser));
+          logger.info('Logged-in as: ', authenticatedUser);
+          logger.info('get this user: ', emberObjWrapper.emberUser(user, authenticatedUser));
           return res.send(200, {user: emberObjWrapper.emberUser(user, authenticatedUser)});
         } else {
           logger.info('Not Logged In');
-          logger.info('getTheUser: '+ emberObjWrapper.emberUser(user));
+          logger.info('getTheUser: ', emberObjWrapper.emberUser(user));
           return res.send(200, {user: emberObjWrapper.emberUser(user)});
         }
       } else {
@@ -171,7 +172,7 @@ userOperation.getUser = function(req, res){
       var userId = req.params.user_id;
       getTheUser(userId);
     } else {
-      logger.error('Error 404');
+      logger.error('Error 404 on not-logged-in');
       return res.send(404);
     }  
   } else {
@@ -180,7 +181,7 @@ userOperation.getUser = function(req, res){
     if(authenticatedUser && userId){
       getTheUser(userId, authenticatedUser);
     } else {
-      logger.error('Error 404');
+      logger.error('Error 404 on logged-in');
       return res.send(404);
     }  
   }
