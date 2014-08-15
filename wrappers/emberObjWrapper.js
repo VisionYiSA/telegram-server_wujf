@@ -2,6 +2,7 @@ var logger = require('nlogger').logger(module);
 
 function isCurrentUserFollowing(mongoUser, currentUser){
 	logger.info('Is ',mongoUser.username,' Followed by ',currentUser,' ?');
+	
 	if(mongoUser.followers.indexOf(currentUser) >= 0){
 		logger.info('isCurrentUserFollowing?: True')
 		return true;
@@ -13,6 +14,7 @@ function isCurrentUserFollowing(mongoUser, currentUser){
 
 var isCurrentUserFollowed = function(mongoUser, currentUser){
 	logger.info('Is ',mongoUser.username,' Following ',currentUser,' ?');
+
 	if(mongoUser.followees.indexOf(currentUser) >= 0){
 		logger.info('isCurrentUserFollowed?: True')
 		return true;
@@ -40,6 +42,7 @@ emberWrapper.emberUser = function(mongoUser, currentUser){
 
 emberWrapper.emberPost = function(mongoPost){
 	logger.info('mongoPost in emberPost func: ',mongoPost);
+
 	var post = {
     'id':       mongoPost._id,
     'body':     mongoPost.body,
@@ -53,6 +56,7 @@ emberWrapper.emberPost = function(mongoPost){
 
 emberWrapper.emberPostAuthor = function(mongoUser, currentUser){
 	logger.info('mongoUser in emberPostAuthor func: ',mongoUser);
+
 	var postUser = {
 		'id': 			mongoUser.username,
 		'username': mongoUser.username,

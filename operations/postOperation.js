@@ -1,14 +1,15 @@
-var conn = require('../dbconnection').defaultConnection,
-    User = conn.model('User'),
-    Post = conn.model('Post'),
+var conn            = require('../dbconnection').defaultConnection,
+    User            = conn.model('User'),
+    Post            = conn.model('Post'),
     emberObjWrapper = require('../wrappers/emberObjWrapper'),
-    postOperation = exports,
-    logger = require('nlogger').logger(module);
+    postOperation   = exports,
+    logger          = require('nlogger').logger(module);
 
 
 function getUsers(postAuthorUsernames, authenticatedUser, callback){
   logger.info('In getUsers(), postAuthorUsernames: ', postAuthorUsernames);
   var emberPostAuthors = [];
+
   User.find({'username': {$in: postAuthorUsernames}}, function(err, users){
     users.forEach(
       function(user){
@@ -16,19 +17,23 @@ function getUsers(postAuthorUsernames, authenticatedUser, callback){
         emberPostAuthors.push(emberObjWrapper.emberPostAuthor(user, authenticatedUser));
       }
     )
+
     logger.info('Return emberPostAuthors: ', emberPostAuthors);
+
     callback(err, emberPostAuthors); 
   });
 }
 
 function getPostsOfOneUser(userId, authenticatedUser, callback){
   logger.info('getPostsOfOneUser in PROCESS');
+
   var emberUserPosts = [],
       postAuthorUsernames = [];
       
   Post.find({'user': userId}).sort({date:-1}).limit(20).exec(function(err, posts){
     if(posts != null) {
       logger.info('Posts found: '+posts);
+
       posts.forEach(
         function(post){
           emberUserPosts.push(emberObjWrapper.emberPost(post));
@@ -38,9 +43,10 @@ function getPostsOfOneUser(userId, authenticatedUser, callback){
       )
     }
     logger.info('Array of postAuthorUsernames: ', postAuthorUsernames);
+
     getUsers(postAuthorUsernames, authenticatedUser, function(err, users){
-      logger.info('emberUserPosts: ', emberUserPosts);
-      logger.info('Sideloaded users to be returned: ', users);
+      logger.info('emberUserPosts: ', emberUserPosts, 'Sideloaded users: ', users);
+
       callback(err, {posts: emberUserPosts, users: users});
     });
     
@@ -49,7 +55,8 @@ function getPostsOfOneUser(userId, authenticatedUser, callback){
 
 function getPostsOnLoggedIn(authenticatedUser, callback){
   logger.info('getPostsOnLoggedIn in PROCESS');
-  var emberUserPosts = [],
+
+  var emberUserPosts      = [],
       postAuthorUsernames = [];
 
   Post.find(
@@ -62,6 +69,7 @@ function getPostsOnLoggedIn(authenticatedUser, callback){
   ).sort({date:-1}).limit(20).exec(function(err, posts){
     if(posts != null) {
       logger.info('Posts found: ', posts);
+
       posts.forEach(
         function(post){
           emberUserPosts.push(emberObjWrapper.emberPost(post));
@@ -70,10 +78,11 @@ function getPostsOnLoggedIn(authenticatedUser, callback){
         }
       )
     }
-    logger.info(postAuthorUsernames);
+    logger.info('postAuthorUsernames: ',postAuthorUsernames);
+
     getUsers(postAuthorUsernames, authenticatedUser.username, function(err, users){
-      logger.info('emberUserPosts: ', emberUserPosts);
-      logger.info('Sideloaded users to be returned: ', users);
+      logger.info('emberUserPosts: ', emberUserPosts, 'Sideloaded users: ', users);
+
       callback(err, {posts: emberUserPosts, users: users});
     });
 
@@ -81,14 +90,15 @@ function getPostsOnLoggedIn(authenticatedUser, callback){
 }
 
 postOperation.getPosts = function(req, res){
-  var followeesOf = req.query.followeesOf;
-  var authenticatedUser = req.user;
-  var userId = req.query.user;
-  var emberUserPosts = [];
-  var postAuthorUsernames = [];
-  var emberPostAuthors = [];
+  var followeesOf         = req.query.followeesOf,
+      authenticatedUser   = req.user,
+      userId              = req.query.user,
+      emberUserPosts      = [],
+      postAuthorUsernames = [],
+      emberPostAuthors    = [];
 
   logger.info('getPosts() in PROCESS');
+
   if(userId){
     logger.info("At UserRoute of: ", userId);
 
@@ -96,13 +106,13 @@ postOperation.getPosts = function(req, res){
       if(err){
         logger.error('Error on getPostsOfOneUser(): ', err);
         res.send(404);
+        
       } else {
-        logger.info('result of getPostsOfOneUser(): ', result);
-        logger.info('result.posts: ', result.posts);
-        logger.info('result.users: ', result.users);
+        logger.info('result of getPostsOfOneUser(): ', result, ' result.posts: ', result.posts, ' result.users: ', result.users);
         res.send(200, {posts: result.posts, users: result.users});
       }
     });
+
   } else if(!userId && authenticatedUser.username === followeesOf){
     logger.info("Logged-in at PostsRoute");
 
@@ -111,13 +121,13 @@ postOperation.getPosts = function(req, res){
         logger.error('Error on getPostsOnLoggedIn: ', err);
         res.send(404);
       } else {
-        logger.info('result = ', result);
-        logger.info('posts: ', result.posts);
-        logger.info('users: ', result.users);
+        logger.info('result: ', result, 'posts: ', result.posts, 'users: ', result.users);
         res.send(200, {posts: result.posts, users: result.users});
       }
     });
+
   } else {
+
     logger.error('Error on getting posts: 404');
     return res.send(404);
   }
@@ -125,39 +135,48 @@ postOperation.getPosts = function(req, res){
  
 postOperation.publishPost = function(req, res){
   logger.info('Publishing a post in PROCESS');
+
   var newPost;
 
   if(req.body.post.originalAuthor){
-    logger.info('req.body.post.originalAuthor ', req.body.post.originalAuthor);
+
     newPost = new Post({
       body: req.body.post.body,
       user: req.body.post.user,
       originalAuthor: req.body.post.originalAuthor
     });
+
     logger.info('Post of repost: ', newPost);
+
   } else if(req.user.username == req.body.post.user){
+
     newPost = new Post({
       body: req.body.post.body,
       user: req.body.post.user,
     });
+
     logger.info('New Post: ', newPost);
+
   } else {
     logger.error('Error on publishing a post: 403');
     res.send(403);
   }
 
   newPost.save(function(err, post){
-    if(err) return logger.error('Error on saving a post: ', err);
+    if(err) logger.error('Error on saving a post: ', err);
     return res.send(200, {post: emberObjWrapper.emberPost(post)});
   });
+
 };
  
 postOperation.deletePost =  function(req, res){
-  var postToDelete = req.params.post_id;
-  logger.info('Deleting this post id: ', postToDelete)
-  var query  = {'_id': postToDelete};
+
+  var postToDelete = req.params.post_id,
+      query        = {'_id': postToDelete};
+
   Post.findOneAndRemove(query, function(err, post){
     if(err) logger.error('Error on findOneAndRemove(): ', err);
+
     post.remove(function(err){
       if(err) {
         logger.error('Error on removing a post: ', err);
@@ -166,5 +185,6 @@ postOperation.deletePost =  function(req, res){
         return res.send(200);
       }
     });
+
   });
 };
