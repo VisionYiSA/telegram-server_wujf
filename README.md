@@ -81,3 +81,4 @@ Keys: ember styled object? Array/Object?
 
 **deploySet**
 * Refactor & Bug fixed [gists](https://gist.github.com/yhagio/b1bf3cda0da0b707ca24)
+* User registration restriction (No duplicate username & email) [commit](https://github.com/yhagio/telegram-server/commit/5044701f1785f0bc5d3a52431013ac4b321a1459)
