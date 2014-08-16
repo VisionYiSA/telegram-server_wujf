@@ -1,20 +1,20 @@
-var passport = require('passport'),
-    bcrypt   = require('bcrypt'),
-    config   = require('../config'),
-    logger   = require('nlogger').logger(module);
+var passport = require('passport');
+var bcrypt   = require('bcrypt');
+var config   = require('../config');
+var logger   = require('nlogger').logger(module);
 
 require('../authentications/passport')(passport);
 
-var conn = require('../dbconnection').defaultConnection,
-    User = conn.model('User')
-    emberObjWrapper = require('../wrappers/emberObjWrapper'),
-    resetPass       = require('../resetPass/sendNewPass');
-    userOperation   = exports;
+var conn = require('../dbconnection').defaultConnection;
+var User = conn.model('User');
+var emberObjWrapper = require('../wrappers/emberObjWrapper');
+var resetPass       = require('../resetPass/sendNewPass');
+var userOperation   = exports;
 
 userOperation.register = function(req, res){
-  var randomNum = Math.floor(5*Math.random()),
-      avatar    = 'images/avatar-'+randomNum+'.png',
-      hasedPassword;
+  var randomNum = Math.floor(5*Math.random());
+  var avatar    = 'images/avatar-'+randomNum+'.png';
+  var hasedPassword = null;
 
   bcrypt.genSalt(10, function(err, salt) {
     bcrypt.hash(req.body.user.password, salt, function(err, hash) {
@@ -32,8 +32,10 @@ userOperation.register = function(req, res){
 
       newUser.save(function(err, user){
         req.login(user, function(err) {
-          if (err) { return res.send(400); }  
-          logger.info('emberObjWrapper.emberUser(user): '+emberObjWrapper.emberUser(user));
+          if (err) { 
+            return res.send(400); 
+          }  
+          logger.info('emberObjWrapper.emberUser(user): ', emberObjWrapper.emberUser(user));
           return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
         });
       });
@@ -95,25 +97,31 @@ function getFollowers(currentUserAsFollowee, authenticatedUser, callback){
 }
 
 userOperation.userQueryHandlers = function(req, res, next){
-  console.log(req);
-  var username      = req.query.username,
-      password      = req.query.password,
-      email         = req.query.email,
-      operation     = req.query.operation,
-      currentUserAsFollower = req.query.follower,
-      currentUserAsFollowee = req.query.followee,
-      isAuthenticated = req.query.isAuthenticated;
+
+  var username      = req.query.username;
+  var password      = req.query.password;
+  var email         = req.query.email;
+  var operation     = req.query.operation;
+  var currentUserAsFollower = req.query.follower;
+  var currentUserAsFollowee = req.query.followee;
+  var isAuthenticated = req.query.isAuthenticated;
 
   if(operation == 'login'){
     logger.info('LOGIN PROCESS');
 
     passport.authenticate('local', function(err, user, info) {
 
-      if (err) { logger.error('Error on passport.authenticate(): ', err); return res.send(400); }
+      if (err) { 
+        logger.error('Error on passport.authenticate(): ', err); 
+        return res.send(400); 
+      }
       if (!user) { return res.send(400); }
 
       req.login(user, function(err) {
-        if (err) { logger.error('Error on login(): ', err); return res.send(400); }
+        if (err) { 
+          logger.error('Error on login(): ', err); 
+          return res.send(400); 
+        }
         logger.info('emberObjWrapper.emberUser(user): ', emberObjWrapper.emberUser(user));
         return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
       });
@@ -163,17 +171,20 @@ userOperation.userQueryHandlers = function(req, res, next){
     resetPass.sendNewPass(req, res, username, email);
 
   } else if (isAuthenticated == 'true'){
-    logger.info('req.user: ' + req.user);
-    logger.info('req.isAuthenticated ?: ' + req.isAuthenticated());
+    logger.info('req.user: ', req.user);
+    logger.info('req.isAuthenticated ?: ',req.isAuthenticated());
 
     if (req.user){
+      logger.info('isAuthenticated == true. You are: ', req.user.username);
       return res.send(200, {user: [emberObjWrapper.emberUser(req.user)]});
+
     } else {
-      return res.send(200, {user: null});
+      logger.info('Not logged in / registered yet');
+      return res.send(200);
     }
+
   } else {
     logger.error('No matched user found');
-
     return res.send(404);
   }
 };
@@ -183,6 +194,7 @@ userOperation.getUser = function(req, res){
 
   function getTheUser(user_id, authenticatedUser){
     User.findOne({'username': user_id}, function(err, user){
+
       if(user != null) { 
         if(authenticatedUser){
           logger.info('Logged-in as: ', authenticatedUser, ' get this user: ', emberObjWrapper.emberUser(user, authenticatedUser));
@@ -197,13 +209,16 @@ userOperation.getUser = function(req, res){
         logger.error('Error 404');
         return res.send(404);
       }
+
     });  
   }
 
   if(!req.user){
+
     if(req.params.user_id) {
       var userId = req.params.user_id;
       getTheUser(userId);
+      
     } else {
       logger.error('Error 404 on not-logged-in');
       return res.send(404);
@@ -215,6 +230,7 @@ userOperation.getUser = function(req, res){
 
     if(authenticatedUser && userId){
       getTheUser(userId, authenticatedUser);
+
     } else {
       logger.error('Error 404 on logged-in');
       return res.send(404);
