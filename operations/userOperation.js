@@ -16,32 +16,49 @@ userOperation.register = function(req, res){
   var avatar    = 'images/avatar-'+randomNum+'.png';
   var hasedPassword = null;
 
-  bcrypt.genSalt(10, function(err, salt) {
-    bcrypt.hash(req.body.user.password, salt, function(err, hash) {
-      hasedPassword = hash;
+  User.findOne({$or:[
+      {'email': req.body.user.email}, 
+      {'username': req.body.user.username}
+    ]}, function(err, user){
 
-      var newUser = new User({
-        username: req.body.user.username,
-        name:     req.body.user.name,
-        email:    req.body.user.email,
-        password: hasedPassword,
-        avatar:   avatar
-      });
+      if(user.email === req.body.user.email){
+        logger.error('This email is already registered!');
+        res.send(403, 'This email is already registered!');
 
-      logger.info('Registering User.username: ', newUser.username);
+      } else if(user.username === req.body.user.username){
+        logger.error('This username is already registered!');
+        res.send(403, 'This username is already registered!');
 
-      newUser.save(function(err, user){
-        req.login(user, function(err) {
-          if (err) { 
-            return res.send(400); 
-          }  
-          logger.info('emberObjWrapper.emberUser(user): ', emberObjWrapper.emberUser(user));
-          return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
+      }else {
+        bcrypt.genSalt(10, function(err, salt) {
+          bcrypt.hash(req.body.user.password, salt, function(err, hash) {
+            hasedPassword = hash;
+
+            var newUser = new User({
+              username: req.body.user.username,
+              name:     req.body.user.name,
+              email:    req.body.user.email,
+              password: hasedPassword,
+              avatar:   avatar
+            });
+
+            logger.info('Registering User.username: ', newUser.username);
+
+            newUser.save(function(err, user){
+              req.login(user, function(err) {
+                if (err) { 
+                  return res.send(400); 
+                }  
+                logger.info('emberObjWrapper.emberUser(user): ', emberObjWrapper.emberUser(user));
+                return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
+              });
+            });
+
+          });
         });
-      });
-
-    });
-  });
+      }
+    }
+  )
 };
 
 function getFollowees(currentUserAsFollower, authUser, callback){
