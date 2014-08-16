@@ -187,7 +187,6 @@ postOperation.publishPost = function(req, res){
     logger.info('Successfully published a post');
     return res.send(200, {post: emberObjWrapper.emberPost(post)});
   });
-
 };
  
 postOperation.deletePost =  function(req, res){

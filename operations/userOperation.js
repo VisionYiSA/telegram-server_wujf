@@ -67,7 +67,7 @@ function getFollowees(currentUserAsFollower, authUser, callback){
         })
       };
       emberFollowees.push(emberObjWrapper.emberUser(authUser));
-      logger.info('emberFollowees: ', emberFollowees);
+      logger.info('emberFollowees + myself: ', emberFollowees);
     }
     callback(err, emberFollowees);
 
@@ -91,7 +91,7 @@ function getFollowers(currentUserAsFollowee, authUser, callback){
         })
       }
       emberFollowers.push(emberObjWrapper.emberUser(authUser));
-      logger.info('emberFollowees: ', emberFollowers);
+      logger.info('emberFollowees + myself: ', emberFollowers);
     } 
     callback(err, emberFollowers);
   });
