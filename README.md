@@ -80,4 +80,4 @@ Keys: ember styled object? Array/Object?
 * Repost function: [gists](https://gist.github.com/yhagio/db981b7853d6d02477a1)
 
 **deploySet**
-* Refactor [gists]()
+* Refactor & Bug fixed [gists](https://gist.github.com/yhagio/b1bf3cda0da0b707ca24)
