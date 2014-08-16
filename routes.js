@@ -2,7 +2,6 @@ var ensureAuth        = require('./authentications/ensureAuthenticated');
 var userOperation     = require('./operations/userOperation');
 var postOperation     = require('./operations/postOperation');
 var userPageOperation = require('./operations/userPageOperation');
-var emberObjWrapper   = require('./wrappers/emberObjWrapper');
     
 module.exports = function(app) {
   app.get('/', function(req, res){res.send('Register');});
