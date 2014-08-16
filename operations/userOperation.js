@@ -44,8 +44,8 @@ userOperation.register = function(req, res){
   });
 };
 
-function getFollowees(currentUserAsFollower, authenticatedUser, callback){
-  logger.info("GET ", currentUserAsFollower, " 's followees", " authenticatedUser is ", authenticatedUser);
+function getFollowees(currentUserAsFollower, authUser, callback){
+  logger.info("GET ", currentUserAsFollower, " 's followees", " authUser is ", authUser.username);
 
   var emberFollowees = [];
 
@@ -63,10 +63,10 @@ function getFollowees(currentUserAsFollower, authenticatedUser, callback){
         followees.forEach(function(user){
           logger.info('A followee username: ', user.username);
 
-          emberFollowees.push(emberObjWrapper.emberUser(user, authenticatedUser));
+          emberFollowees.push(emberObjWrapper.emberUser(user, authUser.username));
         })
       };
-
+      emberFollowees.push(emberObjWrapper.emberUser(authUser));
       logger.info('emberFollowees: ', emberFollowees);
     }
     callback(err, emberFollowees);
@@ -74,8 +74,8 @@ function getFollowees(currentUserAsFollower, authenticatedUser, callback){
   });
 }
 
-function getFollowers(currentUserAsFollowee, authenticatedUser, callback){
-  logger.info("GET ", currentUserAsFollowee, " 's followers", "authenticatedUser: ", authenticatedUser);
+function getFollowers(currentUserAsFollowee, authUser, callback){
+  logger.info("GET ", currentUserAsFollowee, " 's followers", "authUser: ", authUser.username);
   var emberFollowers = [];
 
   User.find({'followees': currentUserAsFollowee}).sort({date:-1}).limit(20).exec(function(err, followers){
@@ -87,9 +87,10 @@ function getFollowers(currentUserAsFollowee, authenticatedUser, callback){
         logger.info('All the followers: ', followers);
         followers.forEach(function(user){
           logger.info('A follower username: ', user.username);
-          emberFollowers.push(emberObjWrapper.emberUser(user, authenticatedUser));
+          emberFollowers.push(emberObjWrapper.emberUser(user, authUser.username));
         })
       }
+      emberFollowers.push(emberObjWrapper.emberUser(authUser));
       logger.info('emberFollowees: ', emberFollowers);
     } 
     callback(err, emberFollowers);
@@ -131,7 +132,7 @@ userOperation.userQueryHandlers = function(req, res, next){
   } else if(currentUserAsFollower){
     logger.info('/username/followings PROCESS');
 
-    getFollowees(currentUserAsFollower, req.user.username, function(err, users){
+    getFollowees(currentUserAsFollower, req.user, function(err, users){
       if(err){
         logger.error('Error on getFollowees(): ', err);
         return res.send(404);
@@ -150,7 +151,7 @@ userOperation.userQueryHandlers = function(req, res, next){
   } else if(currentUserAsFollowee){
     logger.info('/username/followers PROCESS');
 
-    getFollowers(currentUserAsFollowee, req.user.username, function(err, users){
+    getFollowers(currentUserAsFollowee, req.user, function(err, users){
       if(err){
         logger.error('Error on getFollowers(): ', err);
         return res.send(404);
@@ -192,13 +193,13 @@ userOperation.userQueryHandlers = function(req, res, next){
 userOperation.getUser = function(req, res){
   logger.info('getUser() in PROCESS');
 
-  function getTheUser(user_id, authenticatedUser){
+  function getTheUser(user_id, authUser){
     User.findOne({'username': user_id}, function(err, user){
 
       if(user != null) { 
-        if(authenticatedUser){
-          logger.info('Logged-in as: ', authenticatedUser, ' get this user: ', emberObjWrapper.emberUser(user, authenticatedUser));
-          return res.send(200, {user: emberObjWrapper.emberUser(user, authenticatedUser)});
+        if(authUser){
+          logger.info('Logged-in as: ', authUser, ' get this user: ', emberObjWrapper.emberUser(user, authUser));
+          return res.send(200, {user: emberObjWrapper.emberUser(user, authUser)});
 
         } else {
           logger.info('Not Logged In. getTheUser: ', emberObjWrapper.emberUser(user));
@@ -225,11 +226,11 @@ userOperation.getUser = function(req, res){
     }  
 
   } else {
-    var authenticatedUser = req.user.username,
-        userId            = req.params.user_id;
+    var authUser = req.user.username,
+        userId   = req.params.user_id;
 
-    if(authenticatedUser && userId){
-      getTheUser(userId, authenticatedUser);
+    if(authUser && userId){
+      getTheUser(userId, authUser);
 
     } else {
       logger.error('Error 404 on logged-in');

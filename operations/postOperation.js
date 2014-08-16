@@ -113,7 +113,12 @@ postOperation.getPosts = function(req, res){
   if(userId){
     logger.info("At UserRoute of: ", userId);
 
-    getPostsOfOneUser(userId, authUser.username, function(err, result){
+    var authUserUsername = null;
+    if(authUser){  
+      authUserUsername = authUser.username;
+    }
+
+    getPostsOfOneUser(userId, authUserUsername, function(err, result){
       if(err){
         logger.error('Error on getPostsOfOneUser(): ', err);
         res.send(404);
