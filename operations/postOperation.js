@@ -71,7 +71,7 @@ function getPostsOnLoggedIn(authUser, callback){
   Post.find(
     {$or:[
       {'user': {$in: authUser.followees}},
-      {'user': authUser}
+      {'user': authUser.username}
     ]}
   ).sort({date:-1}).limit(20).exec(function(err, posts){
     if(posts != null) {
