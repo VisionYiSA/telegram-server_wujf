@@ -74,20 +74,22 @@ function getFollowees(currentUserAsFollower, authUser, callback){
     if(err){
       logger.error('Error on finding followees: ', err);
     } else {
-      if(followees){
-        logger.info('All the followees: ', followees);
 
+      if(followees){
         followees.forEach(function(user){
           logger.info('A followee username: ', user.username);
 
-          emberFollowees.push(emberObjWrapper.emberUser(user, authUser.username));
+          if(user.email !== authUser.email){
+            emberFollowees.push(emberObjWrapper.emberUser(user, authUser.username));
+          }
         })
-      };
+      }
+
       emberFollowees.push(emberObjWrapper.emberUser(authUser));
       logger.info('emberFollowees + myself: ', emberFollowees);
     }
-    callback(err, emberFollowees);
 
+    callback(err, emberFollowees);
   });
 }
 
@@ -101,15 +103,19 @@ function getFollowers(currentUserAsFollowee, authUser, callback){
     } else {
 
       if(followers){
-        logger.info('All the followers: ', followers);
         followers.forEach(function(user){
           logger.info('A follower username: ', user.username);
-          emberFollowers.push(emberObjWrapper.emberUser(user, authUser.username));
+
+          if(user.email !== authUser.email){
+            emberFollowers.push(emberObjWrapper.emberUser(user, authUser.username));
+          }
         })
       }
+
       emberFollowers.push(emberObjWrapper.emberUser(authUser));
-      logger.info('emberFollowees + myself: ', emberFollowers);
+      logger.info('emberFollowers + myself: ', emberFollowers);
     } 
+
     callback(err, emberFollowers);
   });
 }

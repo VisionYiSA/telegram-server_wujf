@@ -2,34 +2,38 @@ var passport = require('passport');
 require('../authentications/passport')(passport);
 
 var conn = require('../dbconnection').defaultConnection;
-var async = require("async"),
-    User = conn.model('User'),
-    Post = conn.model('User'),
-    userPageOperation = exports,
-    logger = require('nlogger').logger(module);
+var async = require("async");
+var User = conn.model('User');
+var Post = conn.model('User');
+var userPageOperation = exports;
+var logger = require('nlogger').logger(module);
     
 userPageOperation.follow = function(req, res){
-  var newFollowingUser = req.query.user,
-      loggedInUser     = req.user.username,
-      asyncTasks       = [];
+  var newFollowingUser = req.query.user;
+  var loggedInUser     = req.user.username;
+  var asyncTasks       = [];
 
   logger.info(loggedInUser,' tries to follow ', newFollowingUser);
 
   function updateFollowees(callback){
     var query  = {username: loggedInUser};
     var update = {$addToSet: {followees: newFollowingUser}};
+
     User.findOneAndUpdate(query, update, function(err, result){
       logger.info(result.username, "'s followees: ", result.followees);
     });
+
     callback();
   }
 
   function updateFollowers(callback){
     var query  = {username: newFollowingUser};
     var update = {$addToSet: {followers: loggedInUser}};
+
     User.findOneAndUpdate(query, update, function(err, result){
       logger.info(result.username, "'s followers: ", result.followers);
     });
+
     callback();
   }
 
@@ -48,27 +52,31 @@ userPageOperation.follow = function(req, res){
 };
 
 userPageOperation.unfollow = function(req, res, next){
-  var userToUnfollow = req.query.user,
-      loggedInUser   = req.user.username,
-      asyncTasks     = [];
+  var userToUnfollow = req.query.user;
+  var loggedInUser   = req.user.username;
+  var asyncTasks     = [];
 
   logger.info(loggedInUser,' tries to unfollow ', userToUnfollow);
   
   function updateFollowees(callback){
     var query  = {username: loggedInUser};
     var update = {$pull: {followees: userToUnfollow}};
+
     User.findOneAndUpdate(query, update, function(err, result){
       logger.info(result.username, "'s followees: ", result.followees);
     });
+
     callback();
   }
 
   function updateFollowers(callback){
     var query  = {username: userToUnfollow};
     var update = {$pull: {followers: loggedInUser}};
+
     User.findOneAndUpdate(query, update, function(err, result){
       logger.info(result.username, "'s followers: ", result.followers);
     });
+    
     callback();
   }
 
