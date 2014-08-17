@@ -78,15 +78,12 @@ function getFollowees(currentUserAsFollower, authUser, callback){
       if(followees){
         followees.forEach(function(user){
           logger.info('A followee username: ', user.username);
-
-          if(user.email !== authUser.email){
-            emberFollowees.push(emberObjWrapper.emberUser(user, authUser.username));
-          }
-        })
+          emberFollowees.push(emberObjWrapper.emberUser(user, authUser.username));
+        });
       }
 
       emberFollowees.push(emberObjWrapper.emberUser(authUser));
-      logger.info('emberFollowees + myself: ', emberFollowees);
+      logger.info('emberFollowees + myself: ', emberFollowees);  
     }
 
     callback(err, emberFollowees);
