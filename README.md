@@ -1,14 +1,21 @@
-### Telegram server
+#Telegram - twitter like app built with Ember CLI Server Side Repo
+
+Note
+```
+Tech Stack: nginx, node.js, mongoDB, passport, mailgun
+Development: Virtualbox Ubuntu 64bit
+Deployment: DigitalOcean Ubuntu 14.04 64bit
+```
 
 * Client side repo: [https://github.com/yhagio/telegram-cli](https://github.com/yhagio/telegram-cli)
 
 #### Todos:
-* **Step1**
+**Step1**
 * nginx settings [http://yhagio.github.io/blog/2014/06/12/nginx-setup/](http://yhagio.github.io/blog/2014/06/12/nginx-setup/)
 * Implement all the routes required by the ember.js app with the same dummy data from the previously used fixtures adapter (client side). 
-- [Routing ](http://expressjs.com/4x/api.html#app.VERB), 
-- [req.params ](http://expressjs.com/4x/api.html#req.params), 
-- [res.send()](http://expressjs.com/4x/api.html#res.send)
+-- [Routing ](http://expressjs.com/4x/api.html#app.VERB), 
+-- [req.params ](http://expressjs.com/4x/api.html#req.params), 
+-- [res.send()](http://expressjs.com/4x/api.html#res.send)
 
 * Deleted `res.redirect()` since in client-side takes care of the transition `.transitionToRoute()`
 
@@ -18,29 +25,25 @@
 * Installed `passport`, `passport-local`, `cookie-parser`, `express-session`.
 * Issue note [https://gist.github.com/yhagio/0e29815cd1e1f086242e](https://gist.github.com/yhagio/0e29815cd1e1f086242e)
 
-* **Step3 - Passport Authentication 2**
+**Step3 - Passport Authentication 2**
 * use `req.isAuthenticated` and implement `ensureAuthenticated` middleware in order to prevent publishing a post by unauthorized user
 * Issue note: [https://gist.github.com/yhagio/5e2b2d11076e8aede483](https://gist.github.com/yhagio/5e2b2d11076e8aede483)
 
-* **Step4 - MongoDB**
+**Step4 - MongoDB**
 * Comprehension check: [Explain everything that is happening on the backend](https://gist.github.com/yhagio/7394b91dfe236ef48814)
 * Ubuntu Installation of MongoDB Issue note: [https://gist.github.com/yhagio/dcc4bd40ac3a32ec5084](https://gist.github.com/yhagio/dcc4bd40ac3a32ec5084)
 * Changed the address of mongoose setting `mongoose.connect('mongodb://192.168.56.10/telegram'	` ip to localhost `mongoose.connect('mongodb://127.0.0.1/telegram'	`
 * MongoDB shell commands [https://gist.github.com/yhagio/ce335d4c5aa506b2399f](https://gist.github.com/yhagio/ce335d4c5aa506b2399f)
 
-* **Step5 - Connect-mongostore / Code Design**
+**Step5 - Connect-mongostore / Code Design**
 * `id` and `_id` gist: [https://gist.github.com/yhagio/9702f9a9d9c54abe8352](https://gist.github.com/yhagio/9702f9a9d9c54abe8352)
 * [Install connect-mongostore](https://github.com/diversario/connect-mongostore)
 * Modules: Database, Routes, Passport, API Modules [https://gist.github.com/yhagio/a0df02003c75f6887fc5](https://gist.github.com/yhagio/a0df02003c75f6887fc5)
 * changed from `===` to `==` and `id` to `_id` in the `/api/posts` route
-```
-// before
-if(req.user.id === req.body.post.user)
-// After
-if(req.user._id == req.body.post.user)
-// req.user type is object, req.body.post.user type is string
-// mongo objectID
-```
+
+`if(req.user.id === req.body.post.user)` to `if(req.user._id == req.body.post.user)`<br>
+**req.user** type is object (mongo objectID), but **req.body.post.user** type is string
+
 * Post Schema issue [https://gist.github.com/yhagio/5f41cd1f15a67c3d7053](https://gist.github.com/yhagio/5f41cd1f15a67c3d7053)
 * Code organization
 * Changed back the Mongo ObjectID to username to simplify the process. Ember finds user by user_id = username.
@@ -82,3 +85,16 @@ Keys: ember styled object? Array/Object?
 **deploySet**
 * Refactor & Bug fixed [gists](https://gist.github.com/yhagio/b1bf3cda0da0b707ca24)
 * User registration restriction (No duplicate username & email) [commit](https://github.com/yhagio/telegram-server/commit/5044701f1785f0bc5d3a52431013ac4b321a1459)
+
+* **DEPLOYMENT on DigitalOcean**: [Flow & Instruction](https://gist.github.com/yhagio/ba058011c085e897a1d1)
+* **[config.js](https://gist.github.com/yhagio/9c0ba8a594eca2e600ad)**
+
+#### Additional Features to implement
+* User can set his/her profile avatar (Upload and save it)
+* User account page (username, email, full name, password, account deletion)
+* Notification of new post from following users
+* Private message
+* Hash tags
+* Search (users & posts)
+* Load posts button (skip / limit)
+* Link / Share posts
