@@ -21,11 +21,11 @@ userOperation.register = function(req, res){
       {'username': req.body.user.username}
     ]}, function(err, user){
 
-      if(user.email === req.body.user.email){
+      if(user && user.email === req.body.user.email){
         logger.error('This email is already registered!');
         res.send(403, 'This email is already registered!');
 
-      } else if(user.username === req.body.user.username){
+      } else if(user && user.username === req.body.user.username){
         logger.error('This username is already registered!');
         res.send(403, 'This username is already registered!');
 
