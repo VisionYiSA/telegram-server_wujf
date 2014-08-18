@@ -16,10 +16,9 @@ function getUsers(postAuthorUsernames, authUser, callback){
       {'username': authUser}
     ]},
     function(err, users){
-
       users.forEach(
         function(user){
-          logger.info('Each user in postAuthorUsernames: ', user);
+          logger.info('Each user in returned users (geUsers): ', user.username);
           emberPostAuthors.push(emberObjWrapper.emberPostAuthor(user, authUser));
         }
       )
@@ -45,7 +44,9 @@ function getPostsOfOneUser(userId, authUser, callback){
           emberUserPosts.push(emberObjWrapper.emberPost(post));
           
           logger.info('Each post to push: ', post);
-          postAuthorUsernames.push(post.user);
+          if(postAuthorUsernames.indexOf(post.user) < 0){
+            postAuthorUsernames.push(post.user);
+          }
         }
       )
     } else {
@@ -82,7 +83,9 @@ function getPostsOnLoggedIn(authUser, callback){
           logger.info('Each post to push to postAuthorUsernames: ', post);
 
           emberUserPosts.push(emberObjWrapper.emberPost(post));
-          postAuthorUsernames.push(post.user);
+          if(postAuthorUsernames.indexOf(post.user) < 0){
+            postAuthorUsernames.push(post.user);
+          }
         }
       )
     } else {
