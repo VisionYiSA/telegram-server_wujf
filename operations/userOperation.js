@@ -126,6 +126,10 @@ userOperation.userQueryHandlers = function(req, res, next){
   var currentUserAsFollower = req.query.follower;
   var currentUserAsFollowee = req.query.followee;
   var isAuthenticated = req.query.isAuthenticated;
+  var selfusername       = req.query.selfusername;
+
+  logger.info('req.query.selfusername = ', req.query.selfusername);
+  logger.info('selfusername = ', selfusername);
 
   if(operation == 'login'){
     logger.info('LOGIN PROCESS');
@@ -148,6 +152,23 @@ userOperation.userQueryHandlers = function(req, res, next){
       });
 
     })(req, res, next);
+
+  } else if (isAuthenticated == 'true'){
+    logger.info('req.user: ', req.user);
+    logger.info('req.isAuthenticated ?: ',req.isAuthenticated());
+    logger.info('req.query: ', req.query);
+
+    if (req.user){
+      logger.info('isAuthenticated == true. You are: ', req.user.username);
+      return res.send(200, {user: [emberObjWrapper.emberUser(req.user)]});
+    } else {
+      logger.info('Not logged in / registered yet');
+      return res.send(200);
+    }
+
+  } else if (selfusername) {
+        logger.info('isAuthenticated == true. selfusername: ', selfusername);
+        return res.send(200, {user: [emberObjWrapper.emberUser(req.user)]});
 
   } else if(currentUserAsFollower){
     logger.info('/username/followings PROCESS');
@@ -190,19 +211,6 @@ userOperation.userQueryHandlers = function(req, res, next){
   } else if (operation == 'resetPassword' && username && email){
 
     resetPass.sendNewPass(req, res, username, email);
-
-  } else if (isAuthenticated == 'true'){
-    logger.info('req.user: ', req.user);
-    logger.info('req.isAuthenticated ?: ',req.isAuthenticated());
-
-    if (req.user){
-      logger.info('isAuthenticated == true. You are: ', req.user.username);
-      return res.send(200, {user: [emberObjWrapper.emberUser(req.user)]});
-
-    } else {
-      logger.info('Not logged in / registered yet');
-      return res.send(200);
-    }
 
   } else {
     logger.error('No matched user found');
@@ -257,6 +265,42 @@ userOperation.getUser = function(req, res){
       return res.send(404);
     }  
   }
+};
+
+userOperation.updateUser = function(req, res){
+  logger.info('updateUser: ', req.body);
+
+  var newUserData = req.body.user;
+  var hasedPassword = null;
+
+  bcrypt.genSalt(10, function(err, salt) {
+    bcrypt.hash(newUserData.password, salt, function(err, hash) {
+      hasedPassword = hash;
+
+      var query  = {username: req.user.username};
+
+      var updatingUser = {$set: {
+        name:     newUserData.name,
+        username: newUserData.username,
+        email:    newUserData.email,
+        password: hash
+      }};
+
+      logger.info('Updating user is: ', newUserData.username);
+
+      User.findOneAndUpdate(query, updatingUser, function(err, user){
+        req.login(user, function(err) {
+          if (err) { 
+            logger.info('Failed to update a user', err);
+            return res.send(400); 
+          }  
+          logger.info('Successfully updated a user');
+          return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
+        });
+      });
+
+    });
+  });
 };
 
 userOperation.logout = function(req, res){

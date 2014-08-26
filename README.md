@@ -89,6 +89,9 @@ Keys: ember styled object? Array/Object?
 * **DEPLOYMENT on DigitalOcean**: [Flow & Instruction](https://gist.github.com/yhagio/ba058011c085e897a1d1)
 * **[config.js](https://gist.github.com/yhagio/9c0ba8a594eca2e600ad)**
 
+**userAccount**
+* User can change their information (except avatar yet) [commit]()
+
 #### Additional Features to implement
 * User can set his/her profile avatar (Upload and save it)
 * User account page (username, email, full name, password, account deletion)
@@ -98,3 +101,7 @@ Keys: ember styled object? Array/Object?
 * Search (users & posts)
 * Load posts button (skip / limit)
 * Link / Share posts
+
+
+**userAccount**
+* [Issues & commits on gists]()
