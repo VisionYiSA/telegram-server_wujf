@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var session      = require('express-session');
 var passport     = require('passport');
 var MongoStore   = require('connect-mongostore')(session);
+var path         = require('path');
 
 module.exports = function(app) {
   app.use(bodyParser());
@@ -16,4 +17,7 @@ module.exports = function(app) {
   }));
   app.use(passport.initialize());
   app.use(passport.session());
+
+  // app.use(express.static(path.join(__dirname, 'public')));
+  // app.set('images', __dirname + '/public/images');
 };

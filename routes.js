@@ -10,6 +10,8 @@ module.exports = function(app) {
   app.get('/api/users/:user_id', userOperation.getUser);
   app.get('/api/logout', userOperation.logout);
   app.get('/api/sentpassnotify', function(req, res){});
+
+  // app.post('/api/users/:user_id', userOperation.avatarUpload(app.get('images')));
   app.put('/api/users/:user_id', userOperation.updateUser);
 
   app.get('/api/posts', postOperation.getPosts);

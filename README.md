@@ -90,7 +90,7 @@ Keys: ember styled object? Array/Object?
 * **[config.js](https://gist.github.com/yhagio/9c0ba8a594eca2e600ad)**
 
 **userAccount**
-* User can change their information (except avatar yet) [commit]()
+* User can change their information (except avatar yet) [commit](https://github.com/yhagio/telegram-server/commit/dd96640dd7c91261de325327c5cd42f511ad5725)
 
 #### Additional Features to implement
 * User can set his/her profile avatar (Upload and save it)
