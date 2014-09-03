@@ -417,6 +417,24 @@ userOperation.updateUser = function(req, res){
 //   };
 // };
 
+userOperation.deleteUser = function(req, res){
+  logger.info('Deletting a user action!!!');
+  logger.info('req', req);
+
+  var userToDelete = req.user._id;
+  var query        = {'_id': userToDelete};
+
+  User.findOneAndRemove(query, function(err, user){
+    if(err) {
+      logger.error('Error on findOneAndRemove(): ', err);
+      return res.send(404, 'Not found the user to delete');
+    }
+
+    logger.info('Successfully deleted a user');
+    return res.send(200);
+  });
+};
+
 userOperation.logout = function(req, res){
   req.logout();
   logger.info('Logged Out Successfully');
