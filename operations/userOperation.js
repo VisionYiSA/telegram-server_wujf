@@ -274,74 +274,6 @@ userOperation.getUser = function(req, res){
   }
 };
 
-// userOperation.updateUser = function(storage){
-//   return function(req, res){
-//     logger.info('req: ', req);
-//     // logger.info('req.files', req.files);
-//     logger.info('updateUser: ', req.body.user);
-
-//     var newUserData = req.body.user;
-
-//     var hasedPassword = null;
-
-//     var query  = {username: req.user.username};
-
-//     // var form = new multiparty.Form();
-//     // form.parse(newUserData, function(err, fields, files){
-//       // logger.info('files: ', files);
-
-//       var avatarImg = newUserData.avatar.replace('C:\\fakepath\\','');
-//       logger.info('avatarImg: ', avatarImg);
-
-//       var path = join(storage, avatarImg);
-
-//       logger.info('path: ', path);
-
-//       fs.readFile(newUserData.avatar, function (err, data) {
-//         logger.info('data: ', data);
-
-//         fs.writeFile(path, data, function (err, result) {
-//           logger.info('result: ', result);
-//         });
-//       });
-
-//       // fs.rename(req.body.user.avatar, path, function(err, result){
-//       //   if(err) return res.send(400, err);
-//       //   logger.info('avatar path: ', result);
-//       //   var avatar = result;
-
-//       //   bcrypt.genSalt(10, function(err, salt) {
-//       //     bcrypt.hash(newUserData.password, salt, function(err, hash) {
-//       //       hasedPassword = hash;
-
-//       //       var updatingUser = {$set: {
-//       //         name:     newUserData.name,
-//       //         username: newUserData.username,
-//       //         email:    newUserData.email,
-//       //         password: hash,
-//       //         avatar:   avatar
-//       //       }};
-
-//       //       User.findOneAndUpdate(query, updatingUser, function(err, user){
-//       //         req.login(user, function(err) {
-//       //           if (err) { 
-//       //             logger.info('Failed to update a user', err);
-//       //             return res.send(400); 
-//       //           }  
-//       //           logger.info('Successfully updated a user', user);
-//       //           return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
-//       //         });
-//       //       });
-
-//       //     });
-//       //   });
-
-
-//       // });
-
-//   };
-// };
-
 userOperation.updateUser = function(req, res){
 
   var newUserData = req.body.user;
@@ -376,46 +308,6 @@ userOperation.updateUser = function(req, res){
     });
   });
 };
-
-// userOperation.avatarUpload = function(storage){
-//   return function(req, res){
-//     logger.info('avatar upload req.user.username', req.user.username);
-
-//     var form = new multiparty.Form();
-//     form.parse(req, function(err, fields, files){
-//       logger.info('fields', fields);
-//       logger.info('files', files);
-//       var img = files.avatar[0];
-//       var title = img.originalFilename;
-//       var path = join(storage, img.originalFilename);
-
-//       fs.rename(img.path, path, function(err){
-//         if(err) {
-//           logger.info('Error on fs.rename on avatar uploading');
-//           return res.send(404, err);
-//         }
-
-//         var query  = {username: req.user.username};
-
-//         var updatingUser = {$set: {
-//           avatar: path
-//         }};
-
-//         User.findOneAndUpdate(query, updatingUser, function(err, user){
-//           req.login(user, function(err) {
-//             if (err) { 
-//               logger.info('Failed to update a user with avatar', err);
-//               return res.send(400); 
-//             }  
-//             logger.info('Successfully updated a user with avatar');
-//             return res.send(200, {user: [emberObjWrapper.emberUser(user)]});
-//           });
-//         });
-//       });
-
-//     });
-//   };
-// };
 
 userOperation.deleteUser = function(req, res){
   logger.info('Deletting a user action!!!');
