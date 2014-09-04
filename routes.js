@@ -11,6 +11,9 @@ module.exports = function(app) {
   app.get('/api/logout', userOperation.logout);
   app.get('/api/sentpassnotify', function(req, res){});
 
+  app.put('/api/users/:user_id', userOperation.updateUser);
+  app.delete('/api/users/:user_id', userOperation.deleteUser);
+
   app.get('/api/posts', postOperation.getPosts);
   app.post('/api/posts', ensureAuth, postOperation.publishPost);
   app.delete('/api/posts/:post_id', postOperation.deletePost);

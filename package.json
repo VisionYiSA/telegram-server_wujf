@@ -18,6 +18,7 @@
     "mailgun-js": "~0.5.4",
     "MD5": "~1.2.1",
     "nlogger": "~0.4.0",
-    "forever": "~0.11.1"
+    "forever": "~0.11.1",
+    "multiparty": "~3.3.2"
   }
 }
