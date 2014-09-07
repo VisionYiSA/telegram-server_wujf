@@ -134,9 +134,11 @@ userOperation.userQueryHandlers = function(req, res, next){
   var currentUserAsFollowee = req.query.followee;
   var isAuthenticated = req.query.isAuthenticated;
   var selfusername       = req.query.selfusername;
+  var searchTerm         = req.query.searchTerm;
 
   logger.info('req.query.selfusername = ', req.query.selfusername);
   logger.info('selfusername = ', selfusername);
+  logger.info('searchTerm', searchTerm);
 
   if(operation == 'login'){
     logger.info('LOGIN PROCESS');
@@ -218,6 +220,28 @@ userOperation.userQueryHandlers = function(req, res, next){
   } else if (operation == 'resetPassword' && username && email){
 
     resetPass.sendNewPass(req, res, username, email);
+
+  } else if (searchTerm) {
+    logger.error('Searching', searchTerm);
+
+    var matchedUsers = [];
+
+    User.find({'username': {$regex: searchTerm, $options: 'i'}}).sort({date:-1}).limit(20).exec(function(err, users){
+      if(err){ 
+        logger.error('Error on finding users: ', err);
+        return res.send(404);
+      } else {
+
+        if(users){
+          users.forEach(function(user){
+            matchedUsers.push(emberObjWrapper.emberUser(user, req.user.username));
+          })
+        }
+        logger.info('matchedUsers: ', matchedUsers);
+      } 
+
+      return res.send(200, {users: matchedUsers});
+    });
 
   } else {
     logger.error('No matched user found');

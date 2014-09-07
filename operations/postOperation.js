@@ -55,7 +55,7 @@ function getPostsOfOneUser(userId, authUser, callback){
     logger.info('Array of postAuthorUsernames: ', postAuthorUsernames);
 
     getUsers(postAuthorUsernames, authUser, function(err, users){
-      logger.info('emberUserPosts: ', emberUserPosts, 'Sideloaded users: ', users);
+      logger.info('emberUserPosts: ', emberUserPosts, ' Sideloaded users: ', users);
 
       callback(err, {posts: emberUserPosts, users: users});
     });
@@ -102,6 +102,36 @@ function getPostsOnLoggedIn(authUser, callback){
   });
 }
 
+function getMatchedPostOnSearch(searchTerm, authUser, callback){
+
+  var matchedPosts = [];
+  var postAuthorUsernames = [];
+
+  Post.find({'body': {$regex: searchTerm, $options: 'i'}}).sort({date:-1}).limit(20).exec(function(err, posts){
+    if(err){ 
+      logger.error('Error on finding posts: ', err);
+      return res.send(404);
+    } else {
+
+      if(posts){
+        posts.forEach(function(post){
+          matchedPosts.push(emberObjWrapper.emberPost(post));
+          if(postAuthorUsernames.indexOf(post.user) < 0){
+            postAuthorUsernames.push(post.user);
+          }
+        })
+      }
+      logger.info('matchedPosts: ', matchedPosts);
+    } 
+
+    getUsers(postAuthorUsernames, authUser, function(err, users){
+      logger.info('matchedPosts: ', matchedPosts, 'Sideloaded users: ', users);
+
+      callback(err, {posts: matchedPosts, users: users});
+    });
+  });
+}
+
 postOperation.getPosts = function(req, res){
 
   var followeesOf         = req.query.followeesOf;
@@ -110,6 +140,7 @@ postOperation.getPosts = function(req, res){
   var emberUserPosts      = [];
   var postAuthorUsernames = [];
   var emberPostAuthors    = [];
+  var searchTerm          = req.query.searchTerm;
 
   logger.info('getPosts() in PROCESS');
 
@@ -138,6 +169,25 @@ postOperation.getPosts = function(req, res){
     getPostsOnLoggedIn(authUser, function(err, result){
       if(err){
         logger.error('Error on getPostsOnLoggedIn: ', err);
+        res.send(404);
+
+      } else {
+        logger.info('result: ', result, 'posts: ', result.posts, 'users: ', result.users);
+        res.send(200, {posts: result.posts, users: result.users});
+      }
+    });
+
+  } else if(searchTerm){
+    logger.error('Searching', searchTerm);
+
+    var authUserUsername = null;
+    if(authUser){  
+      authUserUsername = authUser.username;
+    }
+
+    getMatchedPostOnSearch(searchTerm, authUserUsername, function(err, result){
+      if(err){
+        logger.error('Error on getMatchedPostOnSearch: ', err);
         res.send(404);
 
       } else {
