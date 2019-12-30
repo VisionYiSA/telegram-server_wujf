@@ -14,7 +14,7 @@
     "connect-mongostore": "~0.1.0",
     "bcrypt": "~0.7.8",
     "emailjs": "~0.3.10",
-    "handlebars": "~2.0.0-alpha.4",
+    "handlebars": "~4.5.3",
     "mailgun-js": "~0.5.4",
     "MD5": "~1.2.1",
     "nlogger": "~0.4.0",
